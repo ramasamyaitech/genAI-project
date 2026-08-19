@@ -1,0 +1,237 @@
+from config import logger
+
+logger.info("Application started")
+
+logger.warning("Low disk space")
+
+logger.error("Database connection failed")2026-08-06 15:28:21,453 | INFO | embedding_model.py | Loading embedding model: nomic-embed-text
+2026-08-06 15:28:22,322 | INFO | ollama_model.py | Loading model: llama3.2
+2026-08-06 15:29:43,575 | INFO | embedding_model.py | Loading embedding model: nomic-embed-text
+2026-08-06 15:29:44,185 | INFO | ollama_model.py | Loading model: llama3.2
+2026-08-06 15:31:02,208 | INFO | rag_service.py | Question: what is AI?
+2026-08-06 15:31:02,209 | ERROR | routes.py | Index not found: vector_db\faiss_index
+Traceback (most recent call last):
+  File "D:\001_genai-rag-project\api\routes.py", line 45, in ask
+    answer = rag_service.ask(
+             ^^^^^^^^^^^^^^^^
+  File "D:\001_genai-rag-project\services\rag_service.py", line 25, in ask
+    documents = self.vector_store.similarity_search(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\001_genai-rag-project\vectorstore\faiss_store.py", line 82, in similarity_search
+    self.load()
+  File "D:\001_genai-rag-project\vectorstore\faiss_store.py", line 52, in load
+    raise FileNotFoundError(
+FileNotFoundError: Index not found: vector_db\faiss_index
+2026-08-06 15:34:26,773 | INFO | embedding_model.py | Loading embedding model: nomic-embed-text
+2026-08-06 15:34:27,410 | INFO | ollama_model.py | Loading model: llama3.2
+2026-08-06 15:37:26,140 | INFO | rag_service.py | Question: what is employee policy?
+2026-08-06 15:37:26,141 | ERROR | routes.py | Index not found: vector_db\faiss_index
+Traceback (most recent call last):
+  File "D:\001_genai-rag-project\api\routes.py", line 45, in ask
+    answer = rag_service.ask(
+             ^^^^^^^^^^^^^^^^
+  File "D:\001_genai-rag-project\services\rag_service.py", line 25, in ask
+    documents = self.vector_store.similarity_search(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\001_genai-rag-project\vectorstore\faiss_store.py", line 82, in similarity_search
+    self.load()
+  File "D:\001_genai-rag-project\vectorstore\faiss_store.py", line 52, in load
+    raise FileNotFoundError(
+FileNotFoundError: Index not found: vector_db\faiss_index
+2026-08-06 15:43:47,688 | INFO | ingestion_service.py | Ingesting kubernetes.pdf
+2026-08-06 15:43:47,689 | INFO | pdf_loader.py | Loading PDF: uploads\kubernetes.pdf
+2026-08-06 15:44:46,040 | INFO | embedding_model.py | Loading embedding model: nomic-embed-text
+2026-08-06 15:44:47,233 | INFO | ollama_model.py | Loading model: llama3.2
+2026-08-06 15:45:06,451 | INFO | ingestion_service.py | Ingesting aws data engineer interview Q&A.pdf
+2026-08-06 15:45:06,451 | INFO | pdf_loader.py | Loading PDF: uploads\aws data engineer interview Q&A.pdf
+2026-08-06 15:45:08,724 | INFO | pdf_loader.py | Loaded 25 pages
+2026-08-06 15:45:08,724 | INFO | splitter.py | Splitting 25 document(s)...
+2026-08-06 15:45:08,729 | INFO | splitter.py | Created 34 chunks.
+2026-08-06 15:45:08,730 | INFO | faiss_store.py | Creating FAISS index...
+2026-08-06 15:47:28,956 | INFO | embedding_model.py | Loading embedding model: nomic-embed-text
+2026-08-06 15:47:29,447 | INFO | ollama_model.py | Loading model: llama3.2
+2026-08-06 15:47:46,318 | INFO | ingestion_service.py | Ingesting Loan (1).pdf
+2026-08-06 15:47:46,319 | INFO | pdf_loader.py | Loading PDF: uploads\Loan (1).pdf
+2026-08-06 15:47:47,974 | INFO | pdf_loader.py | Loaded 25 pages
+2026-08-06 15:47:47,974 | INFO | splitter.py | Splitting 25 document(s)...
+2026-08-06 15:47:47,979 | INFO | splitter.py | Created 48 chunks.
+2026-08-06 15:47:47,979 | INFO | faiss_store.py | Creating FAISS index...
+2026-08-06 15:50:50,481 | INFO | embedding_model.py | Loading embedding model: nomic-embed-text:latest
+2026-08-06 15:50:51,623 | INFO | ollama_model.py | Loading model: llama3.2:1b
+2026-08-06 15:51:10,147 | INFO | ingestion_service.py | Ingesting Loan (1).pdf
+2026-08-06 15:51:10,147 | INFO | pdf_loader.py | Loading PDF: uploads\Loan (1).pdf
+2026-08-06 15:51:11,929 | INFO | pdf_loader.py | Loaded 25 pages
+2026-08-06 15:51:11,929 | INFO | splitter.py | Splitting 25 document(s)...
+2026-08-06 15:51:11,933 | INFO | splitter.py | Created 48 chunks.
+2026-08-06 15:51:11,934 | INFO | faiss_store.py | Creating FAISS index...
+2026-08-06 15:56:26,208 | INFO | embedding_model.py | Loading embedding model: nomic-embed-text:latest
+2026-08-06 15:56:26,702 | INFO | ollama_model.py | Loading model: llama3.2:1b
+2026-08-06 15:56:44,649 | INFO | ingestion_service.py | Ingesting Loan.pdf
+2026-08-06 15:56:44,651 | INFO | pdf_loader.py | Loading PDF: uploads\Loan.pdf
+2026-08-06 15:56:46,764 | INFO | pdf_loader.py | Loaded 25 pages
+2026-08-06 15:56:46,764 | INFO | splitter.py | Splitting 25 document(s)...
+2026-08-06 15:56:46,769 | INFO | splitter.py | Created 48 chunks.
+2026-08-06 15:56:46,770 | INFO | faiss_store.py | Creating FAISS index...
+2026-08-06 15:57:09,214 | INFO | faiss_store.py | Saved index to vector_db\faiss_index
+2026-08-06 15:57:09,215 | INFO | faiss_store.py | FAISS index created successfully.
+2026-08-06 15:57:09,215 | INFO | ingestion_service.py | Ingestion completed.
+2026-08-06 15:58:05,909 | INFO | rag_service.py | Question: what is loan policy
+2026-08-06 15:58:05,911 | INFO | faiss_store.py | FAISS index loaded.
+2026-08-06 15:58:05,912 | INFO | faiss_store.py | Searching: what is loan policy
+2026-08-06 15:58:49,064 | INFO | rag_service.py | Answer generated.
+2026-08-06 18:25:45,001 | INFO | embedding_model.py | Loading embedding model: nomic-embed-text:latest
+2026-08-06 18:25:45,384 | INFO | ollama_model.py | Loading model: llama3.2:1b
+2026-08-06 18:38:49,594 | INFO | ingestion_service.py | Ingesting Employee_Leave_Policy.pdf
+2026-08-06 18:38:49,595 | INFO | pdf_loader.py | Loading PDF: uploads\Employee_Leave_Policy.pdf
+2026-08-06 18:38:49,984 | INFO | pdf_loader.py | Loaded 1 pages
+2026-08-06 18:38:49,985 | INFO | splitter.py | Splitting 1 document(s)...
+2026-08-06 18:38:49,986 | INFO | splitter.py | Created 1 chunks.
+2026-08-06 18:38:50,236 | INFO | faiss_store.py | FAISS index loaded.
+2026-08-06 18:38:54,422 | INFO | faiss_store.py | Saved index to vector_db\faiss_index
+2026-08-06 18:38:54,422 | INFO | faiss_store.py | Added 1 documents.
+2026-08-06 18:38:54,423 | INFO | ingestion_service.py | Ingestion completed.
+2026-08-06 18:41:00,481 | INFO | rag_service.py | Question: what is employees leave policy
+2026-08-06 18:41:00,482 | INFO | faiss_store.py | FAISS index loaded.
+2026-08-06 18:41:00,482 | INFO | faiss_store.py | Searching: what is employees leave policy
+2026-08-06 18:41:23,012 | INFO | rag_service.py | Answer generated.
+2026-08-06 18:42:54,822 | INFO | embedding_model.py | Loading embedding model: nomic-embed-text:latest
+2026-08-06 18:42:55,477 | INFO | ollama_model.py | Loading model: llama3.2:1b
+2026-08-06 18:45:47,055 | INFO | embedding_model.py | Loading embedding model: nomic-embed-text:latest
+2026-08-06 18:45:47,464 | INFO | ollama_model.py | Loading model: llama3.2:1b
+2026-08-06 18:47:44,356 | INFO | ingestion_service.py | Ingesting Work_From_Home_Policy.pdf
+2026-08-06 18:47:44,356 | INFO | pdf_loader.py | Loading PDF: uploads\Work_From_Home_Policy.pdf
+2026-08-06 18:47:44,663 | INFO | pdf_loader.py | Loaded 1 pages
+2026-08-06 18:47:44,664 | INFO | splitter.py | Splitting 1 document(s)...
+2026-08-06 18:47:44,665 | INFO | splitter.py | Created 1 chunks.
+2026-08-06 18:47:44,732 | INFO | faiss_store.py | FAISS index loaded.
+2026-08-06 18:47:47,836 | INFO | faiss_store.py | Saved index to vector_db\faiss_index
+2026-08-06 18:47:47,837 | INFO | faiss_store.py | Added 1 documents.
+2026-08-06 18:47:47,837 | INFO | ingestion_service.py | Ingestion completed.
+2026-08-06 18:48:09,122 | INFO | rag_service.py | Question: what is work from home policy?
+2026-08-06 18:48:09,123 | INFO | faiss_store.py | FAISS index loaded.
+2026-08-06 18:48:09,124 | INFO | faiss_store.py | Searching: what is work from home policy?
+2026-08-06 18:48:27,761 | INFO | rag_service.py | Answer generated.
+2026-08-06 18:48:55,950 | INFO | rag_service.py | Question: what is apache airflow ?
+2026-08-06 18:48:55,950 | INFO | faiss_store.py | Searching: what is apache airflow ?
+2026-08-06 18:49:31,565 | INFO | rag_service.py | Answer generated.
+2026-08-06 18:51:57,121 | INFO | ingestion_service.py | Ingesting Data Engineering with AWS.pdf
+2026-08-06 18:51:57,121 | INFO | pdf_loader.py | Loading PDF: uploads\Data Engineering with AWS.pdf
+2026-08-06 18:52:20,086 | INFO | pdf_loader.py | Loaded 633 pages
+2026-08-06 18:52:20,086 | INFO | splitter.py | Splitting 633 document(s)...
+2026-08-06 18:52:20,166 | INFO | splitter.py | Created 1693 chunks.
+2026-08-06 19:02:25,807 | INFO | ingestion_service.py | Ingesting Data Engineering with AWS.pdf
+2026-08-06 19:02:25,807 | INFO | pdf_loader.py | Loading PDF: uploads\Data Engineering with AWS.pdf
+2026-08-06 19:02:43,528 | INFO | pdf_loader.py | Loaded 633 pages
+2026-08-06 19:02:43,529 | INFO | splitter.py | Splitting 633 document(s)...
+2026-08-06 19:02:43,652 | INFO | splitter.py | Created 1693 chunks.
+2026-08-06 19:18:05,745 | INFO | faiss_store.py | Saved index to vector_db\faiss_index
+2026-08-06 19:18:05,746 | INFO | faiss_store.py | Added 1693 documents.
+2026-08-06 19:18:05,746 | INFO | ingestion_service.py | Ingestion completed.
+2026-08-06 19:18:17,853 | INFO | embedding_model.py | Loading embedding model: nomic-embed-text:latest
+2026-08-06 19:18:18,292 | INFO | ollama_model.py | Loading model: llama3.2:1b
+2026-08-06 19:18:52,924 | INFO | ingestion_service.py | Ingesting Data Engineering with AWS.pdf
+2026-08-06 19:18:52,925 | INFO | pdf_loader.py | Loading PDF: uploads\Data Engineering with AWS.pdf
+2026-08-06 19:19:09,766 | INFO | pdf_loader.py | Loaded 633 pages
+2026-08-06 19:19:09,767 | INFO | splitter.py | Splitting 633 document(s)...
+2026-08-06 19:19:09,828 | INFO | splitter.py | Created 1693 chunks.
+2026-08-06 19:19:10,115 | INFO | faiss_store.py | FAISS index loaded.
+2026-08-06 19:19:10,115 | INFO | faiss_store.py | Embedding batch 1/17
+2026-08-06 19:19:55,844 | INFO | faiss_store.py | Embedding batch 2/17
+2026-08-06 19:20:44,514 | INFO | faiss_store.py | Embedding batch 3/17
+2026-08-06 19:21:37,152 | INFO | faiss_store.py | Embedding batch 4/17
+2026-08-06 19:22:31,807 | INFO | faiss_store.py | Embedding batch 5/17
+2026-08-06 19:23:30,712 | INFO | faiss_store.py | Embedding batch 6/17
+2026-08-06 19:24:30,163 | INFO | faiss_store.py | Embedding batch 7/17
+2026-08-06 19:25:18,708 | INFO | faiss_store.py | Embedding batch 8/17
+2026-08-06 19:26:13,282 | INFO | faiss_store.py | Embedding batch 9/17
+2026-08-06 19:27:02,769 | INFO | faiss_store.py | Embedding batch 10/17
+2026-08-06 19:27:57,693 | INFO | faiss_store.py | Embedding batch 11/17
+2026-08-06 19:28:55,206 | INFO | faiss_store.py | Embedding batch 12/17
+2026-08-06 19:29:42,838 | INFO | faiss_store.py | Embedding batch 13/17
+2026-08-06 19:30:28,574 | INFO | faiss_store.py | Embedding batch 14/17
+2026-08-06 19:31:17,166 | INFO | faiss_store.py | Embedding batch 15/17
+2026-08-06 19:32:04,855 | INFO | faiss_store.py | Embedding batch 16/17
+2026-08-06 19:32:50,505 | INFO | faiss_store.py | Embedding batch 17/17
+2026-08-06 19:33:36,439 | INFO | faiss_store.py | Saved index to vector_db\faiss_index
+2026-08-06 19:33:36,440 | INFO | faiss_store.py | Added 1693 documents.
+2026-08-06 19:33:36,440 | INFO | ingestion_service.py | Ingestion completed.
+2026-08-06 19:34:27,515 | INFO | embedding_model.py | Loading embedding model: nomic-embed-text:latest
+2026-08-06 19:34:27,924 | INFO | ollama_model.py | Loading model: llama3.2:1b
+2026-08-06 19:34:51,866 | INFO | rag_service.py | Question: what is The processing layer?
+2026-08-06 19:34:52,000 | INFO | faiss_store.py | FAISS index loaded.
+2026-08-06 19:34:52,000 | INFO | faiss_store.py | Searching: what is The processing layer?
+2026-08-06 19:35:27,753 | INFO | rag_service.py | Answer generated.
+2026-08-06 19:41:29,229 | INFO | rag_service.py | Question: what is apach airflow?
+2026-08-06 19:41:29,230 | INFO | faiss_store.py | Searching: what is apach airflow?
+2026-08-06 19:42:17,767 | INFO | rag_service.py | Answer generated.
+2026-08-06 19:46:43,006 | INFO | rag_service.py | Question: explain you project architecture in 10-15 lines
+2026-08-06 19:46:43,006 | INFO | faiss_store.py | Searching: explain you project architecture in 10-15 lines
+2026-08-06 19:47:42,255 | INFO | rag_service.py | Answer generated.
+2026-08-06 19:48:41,670 | INFO | rag_service.py | Question: what is data lake?
+2026-08-06 19:48:41,671 | INFO | faiss_store.py | Searching: what is data lake?
+2026-08-06 19:49:08,720 | INFO | rag_service.py | Answer generated.
+2026-08-06 19:51:34,578 | INFO | rag_service.py | Question: what do you use as data lake?
+2026-08-06 19:51:34,578 | INFO | faiss_store.py | Searching: what do you use as data lake?
+2026-08-06 19:52:03,615 | INFO | rag_service.py | Answer generated.
+2026-08-06 19:55:51,448 | INFO | rag_service.py | Question: what about s3?
+2026-08-06 19:55:51,449 | INFO | faiss_store.py | Searching: what about s3?
+2026-08-06 19:56:17,369 | INFO | rag_service.py | Answer generated.
+2026-08-06 19:56:47,387 | INFO | rag_service.py | Question: explain s3
+2026-08-06 19:56:47,387 | INFO | faiss_store.py | Searching: explain s3
+2026-08-06 19:57:37,381 | INFO | rag_service.py | Answer generated.
+2026-08-07 09:57:48,420 | INFO | embedding_model.py | Loading embedding model: nomic-embed-text:latest
+2026-08-07 09:57:49,154 | INFO | ollama_model.py | Loading model: llama3.2:1b
+2026-08-07 09:59:30,945 | INFO | ingestion_service.py | Ingesting genAI.pdf
+2026-08-07 09:59:30,946 | INFO | pdf_loader.py | Loading PDF: uploads\genAI.pdf
+2026-08-07 09:59:33,448 | INFO | pdf_loader.py | Loaded 145 pages
+2026-08-07 09:59:33,449 | INFO | splitter.py | Splitting 145 document(s)...
+2026-08-07 09:59:33,460 | INFO | splitter.py | Created 149 chunks.
+2026-08-07 09:59:33,460 | INFO | faiss_store.py | Creating FAISS index...
+2026-08-07 10:00:07,250 | INFO | faiss_store.py | Saved index to vector_db\faiss_index
+2026-08-07 10:00:07,250 | INFO | faiss_store.py | FAISS index created successfully.
+2026-08-07 10:00:07,250 | INFO | ingestion_service.py | Ingestion completed.
+2026-08-07 10:00:40,659 | INFO | rag_service.py | Question: what is ai?
+2026-08-07 10:00:40,666 | INFO | faiss_store.py | FAISS index loaded.
+2026-08-07 10:00:40,666 | INFO | faiss_store.py | Searching: what is ai?
+2026-08-07 10:01:55,065 | INFO | rag_service.py | Answer generated.
+2026-08-07 10:03:35,047 | INFO | rag_service.py | Question: what is ML?
+2026-08-07 10:03:35,047 | INFO | faiss_store.py | Searching: what is ML?
+2026-08-07 10:03:55,380 | INFO | rag_service.py | Answer generated.
+2026-08-07 10:08:44,735 | INFO | rag_service.py | Question: what if file size is big. what do you prefer?
+2026-08-07 10:08:44,735 | INFO | faiss_store.py | Searching: what if file size is big. what do you prefer?
+2026-08-07 10:09:46,187 | INFO | rag_service.py | Answer generated.
+2026-08-07 11:38:16,263 | INFO | embedding_model.py | Loading embedding model: nomic-embed-text:latest
+2026-08-07 11:38:17,538 | INFO | ollama_model.py | Loading model: llama3.2:1b
+2026-08-07 11:38:58,456 | INFO | embedding_model.py | Loading embedding model: nomic-embed-text:latest
+2026-08-07 11:38:59,194 | INFO | ollama_model.py | Loading model: llama3.2:1b
+2026-08-07 11:39:57,396 | INFO | rag_service.py | Question: what is AI?
+2026-08-07 11:39:57,530 | INFO | faiss_store.py | FAISS index loaded.
+2026-08-07 11:39:57,531 | INFO | faiss_store.py | Searching: what is AI?
+2026-08-07 11:40:48,843 | INFO | rag_service.py | Answer generated.
+2026-08-07 11:42:01,996 | INFO | rag_service.py | Question: what is ML?
+2026-08-07 11:42:01,997 | INFO | faiss_store.py | Searching: what is ML?
+2026-08-07 11:42:23,155 | INFO | rag_service.py | Answer generated.
+2026-08-07 11:42:49,523 | INFO | rag_service.py | Question: what is deep learning?
+2026-08-07 11:42:49,523 | INFO | faiss_store.py | Searching: what is deep learning?
+2026-08-07 11:43:29,609 | INFO | rag_service.py | Answer generated.
+2026-08-07 12:48:13,747 | INFO | embedding_model.py | Loading embedding model: nomic-embed-text:latest
+2026-08-07 12:48:14,997 | INFO | ollama_model.py | Loading model: llama3.2:1b
+2026-08-07 12:48:49,431 | INFO | rag_service.py | Question: what is RAG application?
+2026-08-07 12:48:49,529 | INFO | faiss_store.py | FAISS index loaded.
+2026-08-07 12:48:49,529 | INFO | faiss_store.py | Searching: what is RAG application?
+2026-08-07 12:49:23,619 | INFO | rag_service.py | Answer generated.
+2026-08-07 12:50:05,575 | INFO | rag_service.py | Question: what is gen ai?
+2026-08-07 12:50:05,576 | INFO | faiss_store.py | Searching: what is gen ai?
+2026-08-07 12:50:48,600 | INFO | rag_service.py | Answer generated.
+2026-08-11 17:19:34,126 | INFO | embedding_model.py | Loading embedding model: nomic-embed-text:latest
+2026-08-11 17:19:35,312 | INFO | ollama_model.py | Loading model: llama3.2:1b
+2026-08-11 17:23:13,079 | INFO | rag_service.py | Question: what is gen ai?
+2026-08-11 17:23:13,765 | INFO | faiss_store.py | FAISS index loaded.
+2026-08-11 17:23:13,765 | INFO | faiss_store.py | Searching: what is gen ai?
+2026-08-11 17:24:10,994 | INFO | rag_service.py | Answer generated.
+2026-08-11 18:39:09,949 | INFO | embedding_model.py | Loading embedding model: nomic-embed-text:latest
+2026-08-11 18:39:10,338 | INFO | ollama_model.py | Loading model: llama3.2:1b
+2026-08-11 18:39:32,199 | INFO | rag_service.py | Question: what is ml?
+2026-08-11 18:39:32,235 | INFO | faiss_store.py | FAISS index loaded.
+2026-08-11 18:39:32,236 | INFO | faiss_store.py | Searching: what is ml?
+2026-08-11 18:40:04,218 | INFO | rag_service.py | Answer generated.
