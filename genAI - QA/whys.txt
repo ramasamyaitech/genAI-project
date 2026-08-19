@@ -1,0 +1,246 @@
+If you say **"I built a RAG application using FAISS, GPT-5/T5, LangChain, and embeddings"**, the interviewer will usually ask **"Why?"** questions to check whether you truly understand the design decisions.
+
+Here are the most common follow-up questions with simple interview answers.
+
+---
+
+# 1. Why did you use RAG instead of fine-tuning?
+
+**Answer:**
+"RAG allows the model to answer using the latest documents without retraining the model. Fine-tuning is expensive, time-consuming, and updates require retraining, whereas RAG only needs the vector database to be updated."
+
+---
+
+# 2. Why did you choose FAISS?
+
+**Answer:**
+"FAISS provides very fast similarity search over millions of vectors. It's open source, easy to integrate, and performs efficient nearest-neighbor searches."
+
+---
+
+# 3. Why not store documents directly in SQL?
+
+**Answer:**
+"SQL databases search exact text or keywords. RAG requires semantic search based on meaning, which vector databases like FAISS support."
+
+---
+
+# 4. Why do we convert text into embeddings?
+
+**Answer:**
+"LLMs cannot compare document meaning directly. Embeddings convert text into numerical vectors so semantically similar content is close together in vector space."
+
+---
+
+# 5. Why do we split documents into chunks?
+
+**Answer:**
+"Large documents exceed the model's context window. Chunking helps retrieve only the relevant sections and improves retrieval accuracy."
+
+---
+
+# 6. Why use chunk overlap?
+
+**Answer:**
+"Important information may span two chunks. Overlap preserves context and reduces information loss."
+
+Example:
+
+```
+Chunk 1:
+The customer signed the...
+
+Chunk 2:
+...agreement on Monday.
+```
+
+Without overlap, the sentence is split awkwardly.
+
+---
+
+# 7. Why did you choose 500–1000 character chunks?
+
+**Answer:**
+"It's a good balance. Very small chunks lose context, while very large chunks include unnecessary information and reduce retrieval quality."
+
+---
+
+# 8. Why use cosine similarity?
+
+**Answer:**
+"Cosine similarity measures how similar two vectors are based on their direction rather than magnitude, making it suitable for semantic search."
+
+---
+
+# 9. Why Top-K = 3 or 5?
+
+**Answer:**
+"One document may not contain the complete answer. Retrieving the top 3–5 relevant chunks usually provides enough context without overwhelming the model."
+
+---
+
+# 10. Why not Top-K = 20?
+
+**Answer:**
+"Too many retrieved chunks increase token usage, latency, cost, and can introduce irrelevant information."
+
+---
+
+# 11. Why GPT-5?
+
+**Answer:**
+"GPT-5 provides strong reasoning, instruction following, and natural language generation, making it suitable for answering questions from retrieved context."
+
+---
+
+# 12. Why T5?
+
+**Answer:**
+"T5 is useful for summarization, question answering, and text transformation tasks. It can also be self-hosted."
+
+---
+
+# 13. Why not use only GPT?
+
+**Answer:**
+"GPT doesn't know private company documents unless they're provided. RAG retrieves relevant documents first, then GPT answers using that context."
+
+---
+
+# 14. Why LangChain?
+
+**Answer:**
+"LangChain simplifies connecting document loaders, chunking, embeddings, vector stores, retrievers, and LLMs into one workflow."
+
+---
+
+# 15. Why prompt engineering?
+
+**Answer:**
+"Good prompts reduce hallucinations and guide the model to answer only from the provided context."
+
+---
+
+# 16. Why did hallucinations happen?
+
+**Answer:**
+"If the retrieved context is incomplete or irrelevant, the LLM may generate a plausible but incorrect answer."
+
+---
+
+# 17. How did you reduce hallucinations?
+
+**Answer:**
+
+* Better retrieval
+* Better embeddings
+* Improved prompts
+* Ask the model to say **'I don't know'** when information is missing
+* Use reranking
+
+---
+
+# 18. Why cache embeddings?
+
+**Answer:**
+"Generating embeddings is computationally expensive. Caching avoids recomputing them for unchanged documents."
+
+---
+
+# 19. Why cache GPT responses?
+
+**Answer:**
+"It reduces latency and API costs for repeated questions."
+
+---
+
+# 20. Why save the FAISS index?
+
+**Answer:**
+"Rebuilding the index every time is slow. Saving and loading the index allows faster application startup."
+
+---
+
+# 21. Why metadata filtering?
+
+**Answer:**
+"It limits retrieval to relevant documents, such as a specific department, project, or date range."
+
+---
+
+# 22. Why reranking?
+
+**Answer:**
+"FAISS retrieves approximate nearest neighbors. A reranker can reorder the results so the most relevant chunks are sent to the LLM."
+
+---
+
+# 23. Why not send the entire PDF?
+
+**Answer:**
+"Large PDFs exceed token limits, increase costs, and include irrelevant information. Retrieving only relevant chunks is more efficient."
+
+---
+
+# 24. Why vector search instead of keyword search?
+
+**Answer:**
+"Vector search understands meaning, while keyword search only matches exact words."
+
+Example:
+
+```
+Question:
+How do I reset my password?
+
+Document:
+Change login credentials.
+```
+
+Keyword search may fail because "password" isn't present, while vector search recognizes the semantic similarity.
+
+---
+
+# 25. What happens if the user uploads a new document?
+
+**Answer:**
+"The document is loaded, chunked, converted into embeddings, and added to the FAISS index so it becomes searchable."
+
+---
+
+# 26. Why use OCR?
+
+**Answer:**
+"Scanned PDFs contain images instead of selectable text. OCR extracts text so it can be embedded and searched."
+
+---
+
+# 27. Why not fine-tune every time documents change?
+
+**Answer:**
+"Fine-tuning is slow and expensive. RAG allows new knowledge to be added immediately by updating the vector database."
+
+---
+
+# 28. Why monitor latency?
+
+**Answer:**
+"Users expect quick responses. We monitor retrieval time, embedding time, LLM response time, and total request latency."
+
+---
+
+## One Real-Time Scenario an Interviewer May Ask
+
+**Q:** *A user asks a question, but the correct answer exists in the PDF and your RAG still returns a wrong answer. What would you check?*
+
+**Answer:**
+
+1. Verify the text was extracted correctly from the PDF.
+2. Check chunk size and overlap.
+3. Confirm embeddings were generated successfully.
+4. Ensure the FAISS index contains the new vectors.
+5. Inspect the retrieved Top-K chunks.
+6. Improve retrieval (Top-K, metadata filters, reranking).
+7. Review the prompt to ensure the LLM answers only from the retrieved context.
+
+These "why" and troubleshooting questions are among the most common follow-ups in interviews for RAG, LangChain, and LLM application development.
