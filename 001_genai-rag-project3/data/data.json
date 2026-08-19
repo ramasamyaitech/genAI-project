@@ -1,0 +1,13 @@
+{
+  "name": "Kamal",
+  "age": 30,
+  "city": "Salem",
+  "email": "kamal@gmail.com",
+  "phone": "7708509982",
+  "skills": [
+    "Python",
+    "AWS",
+    "SQL"
+  ],
+  "is_active": true
+}

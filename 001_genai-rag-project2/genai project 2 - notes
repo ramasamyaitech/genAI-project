@@ -1,0 +1,2329 @@
+Absolutely. I’ll build this as a real-world GenAI Engineer RAG project, not just a toy example.
+
+We’ll use your current environment:
+
+Python 3.12.10
+FastAPI — backend API
+Streamlit — frontend
+LangChain — RAG orchestration
+Ollama — local LLM + embeddings
+FAISS — vector database
+PyPDF — PDF ingestion
+Pydantic — configuration/API models
+
+
+1. Final architecture
+
+                         ┌──────────────────┐
+                         │   PDF Documents  │
+                         └────────┬─────────┘
+                                  │
+                                  ▼
+                         ┌──────────────────┐
+                         │ Document Loader  │
+                         │     PyPDF        │
+                         └────────┬─────────┘
+                                  │
+                                  ▼
+                         ┌──────────────────┐
+                         │    Chunking      │
+                         │ Recursive        │
+                         │ Character Splitter│
+                         └────────┬─────────┘
+                                  │
+                                  ▼
+                         ┌──────────────────┐
+                         │ Embedding Model  │
+                         │ Ollama           │
+                         │ nomic-embed-text │
+                         └────────┬─────────┘
+                                  │
+                                  ▼
+                         ┌──────────────────┐
+                         │   FAISS Vector   │
+                         │      Store       │
+                         └────────┬─────────┘
+                                  │
+                     User Question
+                           │
+                           ▼
+                  ┌─────────────────────┐
+                  │ Query Embedding     │
+                  └──────────┬──────────┘
+                             │
+                             ▼
+                  ┌─────────────────────┐
+                  │ FAISS Similarity    │
+                  │ Search / Top-K       │
+                  └──────────┬──────────┘
+                             │
+                             ▼
+                  ┌─────────────────────┐
+                  │ Similar Chunks      │
+                  │ = Context           │
+                  └──────────┬──────────┘
+                             │
+                             ▼
+                  ┌─────────────────────┐
+                  │ Prompt Template     │
+                  └──────────┬──────────┘
+                             │
+                             ▼
+                  ┌─────────────────────┐
+                  │ Ollama LLM          │
+                  │ llama3.2            │
+                  └──────────┬──────────┘
+                             │
+                             ▼
+                  ┌─────────────────────┐
+                  │ Final Answer        │
+                  │ + Sources           │
+                  └─────────────────────┘
+
+
+mkdir 001_genai-rag-project
+cd 001_genai-rag-project
+
+python -m venv venv
+
+source ./venv/Scripts/activate
+
+
+
+Step 2 — Project structure
+
+Create this structure:
+
+001_genai-rag-project/
+│
+├── app.py
+├── requirements.txt
+├── .env
+├── .gitignore
+│
+├── data/
+│   ├── documents/
+│   └── vectorstore/
+│
+├── api/
+│   ├── __init__.py
+│   └── routes.py
+│
+├── services/
+│   ├── __init__.py
+│   ├── ingestion_service.py
+│   ├── retrieval_service.py
+│   ├── rag_service.py
+│   └── llm_service.py
+│
+├── models/
+│   ├── __init__.py
+│   └── ollama_model.py
+│
+├── schemas/
+│   ├── __init__.py
+│   └── chat_schema.py
+│
+├── utils/
+│   ├── __init__.py
+│   ├── config.py
+│   └── logger.py
+│
+└── frontend/
+    └── streamlit_app.py
+
+
+
+
+===============
+
+
+This separation is useful in interviews because we have:
+
+API
+ ↓
+Service
+ ↓
+Model
+ ↓
+Vector DB
+
+instead of putting everything into one Python file.
+
+
+Step 3 — requirements.txt
+Use the corrected versions:
+
+fastapi==0.116.1
+uvicorn==0.35.0
+pydantic==2.11.7
+pydantic-settings==2.10.1
+
+langchain==0.3.27
+langchain-core==0.3.75
+langchain-community==0.3.29
+langchain-text-splitters==0.3.9
+langchain-ollama==0.3.7
+ollama==0.5.3
+
+faiss-cpu==1.12.0
+pypdf==6.0.0
+python-dotenv==1.1.1
+python-multipart==0.0.20
+requests==2.32.5
+httpx==0.28.1
+
+streamlit==1.49.1
+numpy==2.3.2
+pandas==2.3.2
+pytest==8.4.2
+
+
+
+python -m pip install -r requirements.txt
+
+python -m pip check
+
+Expected:
+No broken requirements found.
+
+
+=================================
+
+Step 4 — Install Ollama
+
+We will use Ollama locally.
+
+Install Ollama, then verify:
+
+# ollama --version
+
+Pull the LLM:
+
+# ollama pull llama3.2:1b
+
+Pull the embedding model:
+# ollama pull nomic-embed-text
+
+
+Check:
+# ollama list
+
+You should have something similar to:
+llama3.2:1b
+nomic-embed-text
+
+
+========================
+
+Step 5 — Configuration
+
+Create:
+.env
+
+OLLAMA_BASE_URL=http://localhost:11434
+
+LLM_MODEL=llama3.2:1b
+EMBEDDING_MODEL=nomic-embed-text
+
+VECTOR_DB_PATH=data/vectorstore
+
+CHUNK_SIZE=800
+CHUNK_OVERLAP=150
+
+TOP_K=4
+SIMILARITY_THRESHOLD=0.4
+
+
+The important parameters are:
+
+chunk_size
+chunk_overlap
+top_k
+similarity_threshold
+
+These will become tuning parameters later.
+
+
+Step 6 — Configuration code
+
+Create:
+
+# utils/config.py
+
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+class Settings(BaseSettings):
+
+    OLLAMA_BASE_URL: str = "http://localhost:11434"
+
+    LLM_MODEL: str = "llama3.2:1b"
+    EMBEDDING_MODEL: str = "nomic-embed-text"
+
+    VECTOR_DB_PATH: str = "data/vectorstore"
+
+    CHUNK_SIZE: int = 800
+    CHUNK_OVERLAP: int = 150
+
+    TOP_K: int = 4
+    SIMILARITY_THRESHOLD: float = 0.4
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        extra="ignore"
+    )
+
+
+settings = Settings()
+
+
+===============================
+
+
+Step 7 — Ollama model
+
+Create:
+# models/ollama_model.py
+
+from langchain_ollama import ChatOllama, OllamaEmbeddings
+
+from utils.config import settings
+
+
+class OllamaModel:
+
+    def get_llm(self):
+
+        return ChatOllama(
+            model=settings.LLM_MODEL,
+            base_url=settings.OLLAMA_BASE_URL,
+            temperature=0
+        )
+
+    def get_embeddings(self):
+
+        return OllamaEmbeddings(
+            model=settings.EMBEDDING_MODEL,
+            base_url=settings.OLLAMA_BASE_URL
+        )
+
+
+==================================
+
+This gives us two different models:
+
+Embedding Model
+      ↓
+nomic-embed-text
+      ↓
+Vector
+
+LLM
+ ↓
+llama3.2:1b
+ ↓
+Answer
+
+Remember this distinction:
+
+Embedding model is for retrieval.
+
+LLM is for generation.
+
+
+=====================
+
+Step 8 — PDF ingestion
+
+Create:
+
+# services/ingestion_service.py
+
+from pathlib import Path
+
+from langchain_community.document_loaders import PyPDFLoader
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_community.vectorstores import FAISS
+
+from models import OllamaModel
+from utils.config import settings
+
+
+class IngestionService:
+
+    def __init__(self):
+
+        self.model = OllamaModel()
+
+        self.embeddings = self.model.get_embeddings()
+
+    def load_pdf(self, file_path: str):
+
+        loader = PyPDFLoader(file_path)
+
+        documents = loader.load()
+
+        return documents
+
+    def split_documents(self, documents):
+
+        splitter = RecursiveCharacterTextSplitter(
+            chunk_size=settings.CHUNK_SIZE,
+            chunk_overlap=settings.CHUNK_OVERLAP
+        )
+
+        chunks = splitter.split_documents(documents)
+
+        return chunks
+
+    def create_vector_store(self, chunks):
+
+        vector_store = FAISS.from_documents(
+            chunks,
+            self.embeddings
+        )
+
+        vector_store.save_local(
+            settings.VECTOR_DB_PATH
+        )
+
+        return vector_store
+
+    def ingest(self, file_path: str):
+
+        documents = self.load_pdf(file_path)
+
+        print(f"Loaded documents: {len(documents)}")
+
+        chunks = self.split_documents(documents)
+
+        print(f"Created chunks: {len(chunks)}")
+
+        vector_store = self.create_vector_store(chunks)
+
+        print("Vector store created successfully.")
+
+        return vector_store
+
+
+============================
+
+
+Step 9 — Export service
+
+Create:
+
+# services/__init__.py
+
+from .ingestion_service import IngestionService
+
+===========================
+
+Step 10 — Put PDF into data/documents
+
+For example:
+
+data/
+└── documents/
+    └── aws-data-engineering.pdf
+
+Then we need an ingestion API.
+
+
+============================
+
+
+Step 11 — Retrieval service
+
+Create:
+
+# services/retrieval_service.py
+
+
+from langchain_community.vectorstores import FAISS
+
+from models import OllamaModel
+from utils.config import settings
+
+
+class RetrievalService:
+
+    def __init__(self):
+
+        self.model = OllamaModel()
+
+        self.embeddings = self.model.get_embeddings()
+
+        self.vector_store = None
+
+        self.load_vector_store()
+
+    def load_vector_store(self):
+
+        self.vector_store = FAISS.load_local(
+            settings.VECTOR_DB_PATH,
+            self.embeddings,
+            allow_dangerous_deserialization=True
+        )
+
+    def retrieve(self, query: str):
+
+        documents = self.vector_store.similarity_search(
+            query,
+            k=settings.TOP_K
+        )
+
+        return documents
+
+
+===================================
+
+
+Step 12 — RAG service
+
+This is the heart of the application.
+
+Create:
+
+# services/rag_service.py
+
+from langchain_core.prompts import ChatPromptTemplate
+
+from models import OllamaModel
+from services.retrieval_service import RetrievalService
+
+
+class RAGService:
+
+    def __init__(self):
+
+        self.model = OllamaModel()
+
+        self.llm = self.model.get_llm()
+
+        self.retriever = RetrievalService()
+
+        self.prompt = ChatPromptTemplate.from_template(
+            """
+You are a helpful AI assistant.
+
+Answer the user's question using ONLY the provided context.
+
+If the answer is not available in the context,
+say:
+
+"I don't have enough information in the provided documents."
+
+Do not make up information.
+
+Context:
+{context}
+
+Question:
+{question}
+
+Answer:
+"""
+        )
+
+    def ask(self, question: str):
+
+        documents = self.retriever.retrieve(question)
+
+        context = "\n\n".join(
+            document.page_content
+            for document in documents
+        )
+
+        prompt = self.prompt.format(
+            context=context,
+            question=question
+        )
+
+        response = self.llm.invoke(prompt)
+
+        sources = [
+            {
+                "page": doc.metadata.get("page"),
+                "source": doc.metadata.get("source")
+            }
+            for doc in documents
+        ]
+
+        return {
+            "answer": response.content,
+            "sources": sources
+        }
+
+
+====================================
+
+
+Step 13 — API schema
+
+Create:
+
+# schemas/chat_schema.py
+
+from pydantic import BaseModel
+
+
+class ChatRequest(BaseModel):
+
+    question: str
+
+
+class ChatResponse(BaseModel):
+
+    answer: str
+    sources: list
+
+
+============================
+
+
+Create:
+# schemas/__init__.py
+from .chat_schema import ChatRequest, ChatResponse
+
+==================
+
+Step 14 — API routes
+
+Create:
+
+# api/routes.py
+
+from fastapi import APIRouter, UploadFile, File
+
+from schemas import ChatRequest, ChatResponse
+from services import IngestionService
+from services.rag_service import RAGService
+
+
+router = APIRouter()
+
+ingestion_service = IngestionService()
+
+
+@router.get("/health")
+def health():
+
+    return {
+        "status": "UP",
+        "message": "RAG API is running"
+    }
+
+
+@router.post("/ingest")
+async def ingest(file: UploadFile = File(...)):
+
+    file_path = f"data/documents/{file.filename}"
+
+    with open(file_path, "wb") as buffer:
+
+        buffer.write(await file.read())
+
+    ingestion_service.ingest(file_path)
+
+    return {
+        "message": "Document ingested successfully",
+        "file": file.filename
+    }
+
+
+@router.post("/chat", response_model=ChatResponse)
+def chat(request: ChatRequest):
+
+    rag_service = RAGService()
+
+    result = rag_service.ask(
+        request.question
+    )
+
+    return result
+
+
+=======================================
+
+Step 15 — API init
+
+Create:
+
+# api/__init__.py
+from .routes import router
+
+======================
+
+Step 16 — Main FastAPI application
+
+Create:
+
+# app.py
+
+from fastapi import FastAPI
+
+from api import router
+
+
+app = FastAPI(
+    title="Enterprise RAG Application",
+    version="1.0.0"
+)
+
+
+app.include_router(
+    router,
+    prefix="/api"
+)
+
+
+@app.get("/")
+def root():
+
+    return {
+        "application": "RAG Application",
+        "status": "running"
+    }
+
+============================
+
+Step 17 — Start the API
+
+Before starting, make sure Ollama is running:
+
+ollama list
+
+Then:
+
+uvicorn app:app --reload
+
+You should get:
+
+Uvicorn running on http://127.0.0.1:8000
+
+Open:
+
+http://127.0.0.1:8000
+
+Expected:
+
+{
+    "application": "RAG Application",
+    "status": "running"
+}
+Step 18 — Test Swagger
+
+Open:
+
+http://127.0.0.1:8000/docs
+
+You'll see:
+
+GET  /api/health
+POST /api/ingest
+POST /api/chat
+Step 19 — Ingest PDF
+
+From Swagger:
+
+POST /api/ingest
+
+Choose:
+
+aws-data-engineering.pdf
+
+Execute.
+
+Internally:
+
+PDF
+ ↓
+PyPDFLoader
+ ↓
+Pages
+ ↓
+RecursiveCharacterTextSplitter
+ ↓
+Chunks
+ ↓
+Ollama Embedding
+ ↓
+Vectors
+ ↓
+FAISS
+ ↓
+data/vectorstore/
+Step 20 — Ask a question
+
+Swagger:
+
+POST /api/chat
+
+Request:
+
+{
+    "question": "What is Amazon S3?"
+}
+
+The execution becomes:
+
+User Question
+      ↓
+Embedding Model
+      ↓
+Query Vector
+      ↓
+FAISS
+      ↓
+Top 4 Chunks
+      ↓
+Context
+      ↓
+Prompt
+      ↓
+Ollama LLM
+      ↓
+Answer
+
+Example response:
+
+{
+    "answer": "Amazon S3 is an object storage service...",
+    "sources": [
+        {
+            "page": 12,
+            "source": "aws-data-engineering.pdf"
+        }
+    ]
+}
+
+=================================
+
+Step 21 — Streamlit frontend
+
+Create:
+
+# frontend/streamlit_app.py
+
+
+import requests
+import streamlit as st
+
+
+API_URL = "http://127.0.0.1:8000/api"
+
+
+st.set_page_config(
+    page_title="RAG Chatbot",
+    page_icon="🤖"
+)
+
+
+st.title("🤖 Enterprise RAG Chatbot")
+
+
+st.header("Upload Document")
+
+uploaded_file = st.file_uploader(
+    "Upload PDF",
+    type=["pdf"]
+)
+
+
+if uploaded_file:
+
+    if st.button("Ingest Document"):
+
+        files = {
+            "file": (
+                uploaded_file.name,
+                uploaded_file.getvalue(),
+                "application/pdf"
+            )
+        }
+
+        response = requests.post(
+            f"{API_URL}/ingest",
+            files=files
+        )
+
+        if response.status_code == 200:
+
+            st.success(
+                "Document ingested successfully!"
+            )
+
+        else:
+
+            st.error(response.text)
+
+
+st.header("Ask Question")
+
+question = st.text_input(
+    "Enter your question"
+)
+
+
+if st.button("Ask"):
+
+    if not question:
+
+        st.warning("Please enter a question.")
+
+    else:
+
+        response = requests.post(
+            f"{API_URL}/chat",
+            json={
+                "question": question
+            }
+        )
+
+        if response.status_code == 200:
+
+            result = response.json()
+
+            st.subheader("Answer")
+
+            st.write(
+                result["answer"]
+            )
+
+            st.subheader("Sources")
+
+            for source in result["sources"]:
+
+                st.write(source)
+
+        else:
+
+            st.error(response.text)
+
+Start it in another terminal:
+
+source ./venv/Scripts/activate
+
+Then:
+
+streamlit run frontend/streamlit_app.py
+
+Now you have:
+
+Browser
+   │
+   ▼
+Streamlit
+   │
+   ▼
+FastAPI
+   │
+   ▼
+RAG Service
+   │
+   ├── Retrieval
+   │      ↓
+   │    FAISS
+   │
+   └── Generation
+          ↓
+        Ollama
+Step 22 — What we have built
+
+At this point, this is a working basic RAG application:
+
+Ingestion
+PDF
+ ↓
+Loader
+ ↓
+Chunking
+ ↓
+Embedding
+ ↓
+FAISS
+Retrieval
+Question
+ ↓
+Embedding
+ ↓
+Similarity Search
+ ↓
+Top-K chunks
+Generation
+Chunks
+ ↓
+Context
+ ↓
+Prompt
+ ↓
+LLM
+ ↓
+Answer
+Step 23 — But this is not yet production-grade
+
+As a GenAI Engineer, I would not stop here.
+
+For an enterprise RAG application, I would add:
+
+                    ┌────────────────────┐
+                    │    User / UI       │
+                    └─────────┬──────────┘
+                              │
+                              ▼
+                    ┌────────────────────┐
+                    │    FastAPI API     │
+                    └─────────┬──────────┘
+                              │
+                 ┌────────────┴─────────────┐
+                 │                          │
+                 ▼                          ▼
+          Authentication              Rate Limiting
+                 │
+                 ▼
+             RAG Service
+                 │
+        ┌────────┼────────┐
+        │        │        │
+        ▼        ▼        ▼
+     Query    Retrieval  Prompt
+     Rewrite  + Rerank   Management
+        │        │        │
+        └────────┼────────┘
+                 ▼
+          Vector Database
+                 │
+                 ▼
+             Context
+                 │
+                 ▼
+             LLM Layer
+                 │
+        ┌────────┼────────┐
+        ▼        ▼        ▼
+      Retry    Timeout   Fallback
+                 │
+                 ▼
+              Answer
+                 │
+        ┌────────┼────────┐
+        ▼        ▼        ▼
+     Sources   Logging   Metrics
+
+The next production features I recommend implementing in this order are:
+
+Metadata filtering
+Similarity score threshold
+Reranking
+Hybrid search
+Query rewriting
+Conversation memory
+Streaming responses
+Redis caching
+PostgreSQL conversation storage
+Authentication / authorization
+Rate limiting
+Retry + exponential backoff
+Token/cost tracking
+Prompt versioning
+Structured logging
+Prometheus/Grafana monitoring
+Evaluation dataset
+RAGAS-style evaluation
+Dockerization
+AWS deployment
+
+That progression will take this from a basic RAG demo → production-style GenAI application, and it also gives you excellent material for your 4+ years GenAI interview scenario questions.
+
+
+
+
+==========================================================
+
+
+
+
+=========================================================
+
+
+
+Absolutely. I’ll build this as a **real-world GenAI Engineer RAG project**, not just a toy example.
+
+We’ll use your current environment:
+
+* **Python 3.12.10**
+* **FastAPI** — backend API
+* **Streamlit** — frontend
+* **LangChain** — RAG orchestration
+* **Ollama** — local LLM + embeddings
+* **FAISS** — vector database
+* **PyPDF** — PDF ingestion
+* **Pydantic** — configuration/API models
+
+## 1. Final architecture
+
+
+                         ┌──────────────────┐
+                         │   PDF Documents  │
+                         └────────┬─────────┘
+                                  │
+                                  ▼
+                         ┌──────────────────┐
+                         │ Document Loader  │
+                         │     PyPDF        │
+                         └────────┬─────────┘
+                                  │
+                                  ▼
+                         ┌──────────────────┐
+                         │    Chunking      │
+                         │ Recursive        │
+                         │ Character Splitter│
+                         └────────┬─────────┘
+                                  │
+                                  ▼
+                         ┌──────────────────┐
+                         │ Embedding Model  │
+                         │ Ollama           │
+                         │ nomic-embed-text │
+                         └────────┬─────────┘
+                                  │
+                                  ▼
+                         ┌──────────────────┐
+                         │   FAISS Vector   │
+                         │      Store       │
+                         └────────┬─────────┘
+                                  │
+                     User Question
+                           │
+                           ▼
+                  ┌─────────────────────┐
+                  │ Query Embedding     │
+                  └──────────┬──────────┘
+                             │
+                             ▼
+                  ┌─────────────────────┐
+                  │ FAISS Similarity    │
+                  │ Search / Top-K       │
+                  └──────────┬──────────┘
+                             │
+                             ▼
+                  ┌─────────────────────┐
+                  │ Similar Chunks      │
+                  │ = Context           │
+                  └──────────┬──────────┘
+                             │
+                             ▼
+                  ┌─────────────────────┐
+                  │ Prompt Template     │
+                  └──────────┬──────────┘
+                             │
+                             ▼
+                  ┌─────────────────────┐
+                  │ Ollama LLM          │
+                  │ llama3.2            │
+                  └──────────┬──────────┘
+                             │
+                             ▼
+                  ┌─────────────────────┐
+                  │ Final Answer        │
+                  │ + Sources           │
+                  └─────────────────────┘
+
+
+---
+
+# Step 1 — Create project
+
+Use:
+
+bash
+mkdir 001_genai-rag-project
+cd 001_genai-rag-project
+
+
+Create the virtual environment:
+
+bash
+python -m venv venv
+
+
+Activate in Git Bash:
+
+bash
+source ./venv/Scripts/activate
+
+
+Verify:
+
+bash
+which python
+
+
+It **must** show:
+
+
+.../001_genai-rag-project/venv/Scripts/python
+
+
+Not:
+
+
+.../Python312/python
+
+
+---
+
+# Step 2 — Project structure
+
+Create this structure:
+
+
+001_genai-rag-project/
+│
+├── app.py
+├── requirements.txt
+├── .env
+├── .gitignore
+│
+├── data/
+│   ├── documents/
+│   └── vectorstore/
+│
+├── api/
+│   ├── __init__.py
+│   └── routes.py
+│
+├── services/
+│   ├── __init__.py
+│   ├── ingestion_service.py
+│   ├── retrieval_service.py
+│   ├── rag_service.py
+│   └── llm_service.py
+│
+├── models/
+│   ├── __init__.py
+│   └── ollama_model.py
+│
+├── schemas/
+│   ├── __init__.py
+│   └── chat_schema.py
+│
+├── utils/
+│   ├── __init__.py
+│   ├── config.py
+│   └── logger.py
+│
+└── frontend/
+    └── streamlit_app.py
+
+
+This separation is useful in interviews because we have:
+
+
+API
+ ↓
+Service
+ ↓
+Model
+ ↓
+Vector DB
+
+
+instead of putting everything into one Python file.
+
+---
+
+# Step 3 — requirements.txt
+
+Use the corrected versions:
+
+
+fastapi==0.116.1
+uvicorn==0.35.0
+pydantic==2.11.7
+pydantic-settings==2.10.1
+
+langchain==0.3.27
+langchain-core==0.3.75
+langchain-community==0.3.29
+langchain-text-splitters==0.3.9
+langchain-ollama==0.3.7
+ollama==0.5.3
+
+faiss-cpu==1.12.0
+pypdf==6.0.0
+python-dotenv==1.1.1
+python-multipart==0.0.20
+requests==2.32.5
+httpx==0.28.1
+
+streamlit==1.49.1
+numpy==2.3.2
+pandas==2.3.2
+pytest==8.4.2
+
+
+Install:
+
+bash
+python -m pip install -r requirements.txt
+
+
+Then:
+
+bash
+python -m pip check
+
+
+Expected:
+
+
+No broken requirements found.
+
+
+---
+
+# Step 4 — Install Ollama
+
+We will use Ollama locally.
+
+Install Ollama, then verify:
+
+bash
+ollama --version
+
+
+Pull the LLM:
+
+bash
+ollama pull llama3.2:1b
+
+
+Pull the embedding model:
+
+bash
+ollama pull nomic-embed-text
+
+
+Check:
+
+bash
+ollama list
+
+
+You should have something similar to:
+
+
+llama3.2:1b
+nomic-embed-text
+
+
+---
+
+# Step 5 — Configuration
+
+Create:
+
+
+.env
+
+
+env
+OLLAMA_BASE_URL=http://localhost:11434
+
+LLM_MODEL=llama3.2:1b
+EMBEDDING_MODEL=nomic-embed-text
+
+VECTOR_DB_PATH=data/vectorstore
+
+CHUNK_SIZE=800
+CHUNK_OVERLAP=150
+
+TOP_K=4
+SIMILARITY_THRESHOLD=0.4
+
+
+The important parameters are:
+
+
+chunk_size
+chunk_overlap
+top_k
+similarity_threshold
+
+
+These will become tuning parameters later.
+
+---
+
+# Step 6 — Configuration code
+
+Create:
+
+
+utils/config.py
+
+
+
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+class Settings(BaseSettings):
+
+    OLLAMA_BASE_URL: str = "http://localhost:11434"
+
+    LLM_MODEL: str = "llama3.2:1b"
+    EMBEDDING_MODEL: str = "nomic-embed-text"
+
+    VECTOR_DB_PATH: str = "data/vectorstore"
+
+    CHUNK_SIZE: int = 800
+    CHUNK_OVERLAP: int = 150
+
+    TOP_K: int = 4
+    SIMILARITY_THRESHOLD: float = 0.4
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        extra="ignore"
+    )
+
+
+settings = Settings()
+
+
+---
+
+# Step 7 — Ollama model
+
+Create:
+
+
+models/ollama_model.py
+
+
+
+from langchain_ollama import ChatOllama, OllamaEmbeddings
+
+from utils.config import settings
+
+
+class OllamaModel:
+
+    def get_llm(self):
+
+        return ChatOllama(
+            model=settings.LLM_MODEL,
+            base_url=settings.OLLAMA_BASE_URL,
+            temperature=0
+        )
+
+    def get_embeddings(self):
+
+        return OllamaEmbeddings(
+            model=settings.EMBEDDING_MODEL,
+            base_url=settings.OLLAMA_BASE_URL
+        )
+
+
+This gives us two different models:
+
+
+Embedding Model
+      ↓
+nomic-embed-text
+      ↓
+Vector
+
+LLM
+ ↓
+llama3.2:1b
+ ↓
+Answer
+
+
+Remember this distinction:
+
+**Embedding model is for retrieval.**
+
+**LLM is for generation.**
+
+---
+
+# Step 8 — PDF ingestion
+
+Create:
+
+
+services/ingestion_service.py
+
+
+
+from pathlib import Path
+
+from langchain_community.document_loaders import PyPDFLoader
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_community.vectorstores import FAISS
+
+from models import OllamaModel
+from utils.config import settings
+
+
+class IngestionService:
+
+    def __init__(self):
+
+        self.model = OllamaModel()
+
+        self.embeddings = self.model.get_embeddings()
+
+    def load_pdf(self, file_path: str):
+
+        loader = PyPDFLoader(file_path)
+
+        documents = loader.load()
+
+        return documents
+
+    def split_documents(self, documents):
+
+        splitter = RecursiveCharacterTextSplitter(
+            chunk_size=settings.CHUNK_SIZE,
+            chunk_overlap=settings.CHUNK_OVERLAP
+        )
+
+        chunks = splitter.split_documents(documents)
+
+        return chunks
+
+    def create_vector_store(self, chunks):
+
+        vector_store = FAISS.from_documents(
+            chunks,
+            self.embeddings
+        )
+
+        vector_store.save_local(
+            settings.VECTOR_DB_PATH
+        )
+
+        return vector_store
+
+    def ingest(self, file_path: str):
+
+        documents = self.load_pdf(file_path)
+
+        print(f"Loaded documents: {len(documents)}")
+
+        chunks = self.split_documents(documents)
+
+        print(f"Created chunks: {len(chunks)}")
+
+        vector_store = self.create_vector_store(chunks)
+
+        print("Vector store created successfully.")
+
+        return vector_store
+
+
+---
+
+# Step 9 — Export service
+
+Create:
+
+
+services/__init__.py
+
+
+
+from .ingestion_service import IngestionService
+
+
+---
+
+# Step 10 — Put PDF into data/documents
+
+For example:
+
+
+data/
+└── documents/
+    └── aws-data-engineering.pdf
+
+
+Then we need an ingestion API.
+
+---
+
+# Step 11 — Retrieval service
+
+Create:
+
+
+services/retrieval_service.py
+
+
+
+from langchain_community.vectorstores import FAISS
+
+from models import OllamaModel
+from utils.config import settings
+
+
+class RetrievalService:
+
+    def __init__(self):
+
+        self.model = OllamaModel()
+
+        self.embeddings = self.model.get_embeddings()
+
+        self.vector_store = None
+
+        self.load_vector_store()
+
+    def load_vector_store(self):
+
+        self.vector_store = FAISS.load_local(
+            settings.VECTOR_DB_PATH,
+            self.embeddings,
+            allow_dangerous_deserialization=True
+        )
+
+    def retrieve(self, query: str):
+
+        documents = self.vector_store.similarity_search(
+            query,
+            k=settings.TOP_K
+        )
+
+        return documents
+
+
+---
+
+# Step 12 — RAG service
+
+This is the heart of the application.
+
+Create:
+
+
+services/rag_service.py
+
+
+
+from langchain_core.prompts import ChatPromptTemplate
+
+from models import OllamaModel
+from services.retrieval_service import RetrievalService
+
+
+class RAGService:
+
+    def __init__(self):
+
+        self.model = OllamaModel()
+
+        self.llm = self.model.get_llm()
+
+        self.retriever = RetrievalService()
+
+        self.prompt = ChatPromptTemplate.from_template(
+            """
+You are a helpful AI assistant.
+
+Answer the user's question using ONLY the provided context.
+
+If the answer is not available in the context,
+say:
+
+"I don't have enough information in the provided documents."
+
+Do not make up information.
+
+Context:
+{context}
+
+Question:
+{question}
+
+Answer:
+"""
+        )
+
+    def ask(self, question: str):
+
+        documents = self.retriever.retrieve(question)
+
+        context = "\n\n".join(
+            document.page_content
+            for document in documents
+        )
+
+        prompt = self.prompt.format(
+            context=context,
+            question=question
+        )
+
+        response = self.llm.invoke(prompt)
+
+        sources = [
+            {
+                "page": doc.metadata.get("page"),
+                "source": doc.metadata.get("source")
+            }
+            for doc in documents
+        ]
+
+        return {
+            "answer": response.content,
+            "sources": sources
+        }
+
+
+---
+
+# Step 13 — API schema
+
+Create:
+
+
+schemas/chat_schema.py
+
+
+
+from pydantic import BaseModel
+
+
+class ChatRequest(BaseModel):
+
+    question: str
+
+
+class ChatResponse(BaseModel):
+
+    answer: str
+    sources: list
+
+
+Create:
+
+
+schemas/__init__.py
+
+
+
+from .chat_schema import ChatRequest, ChatResponse
+
+
+---
+
+# Step 14 — API routes
+
+Create:
+
+
+api/routes.py
+
+
+
+from fastapi import APIRouter, UploadFile, File
+
+from schemas import ChatRequest, ChatResponse
+from services import IngestionService
+from services.rag_service import RAGService
+
+
+router = APIRouter()
+
+ingestion_service = IngestionService()
+
+
+@router.get("/health")
+def health():
+
+    return {
+        "status": "UP",
+        "message": "RAG API is running"
+    }
+
+
+@router.post("/ingest")
+async def ingest(file: UploadFile = File(...)):
+
+    file_path = f"data/documents/{file.filename}"
+
+    with open(file_path, "wb") as buffer:
+
+        buffer.write(await file.read())
+
+    ingestion_service.ingest(file_path)
+
+    return {
+        "message": "Document ingested successfully",
+        "file": file.filename
+    }
+
+
+@router.post("/chat", response_model=ChatResponse)
+def chat(request: ChatRequest):
+
+    rag_service = RAGService()
+
+    result = rag_service.ask(
+        request.question
+    )
+
+    return result
+
+
+---
+
+# Step 15 — API init
+
+Create:
+
+
+api/__init__.py
+
+
+
+from .routes import router
+
+
+---
+
+# Step 16 — Main FastAPI application
+
+Create:
+
+
+app.py
+
+
+
+from fastapi import FastAPI
+
+from api import router
+
+
+app = FastAPI(
+    title="Enterprise RAG Application",
+    version="1.0.0"
+)
+
+
+app.include_router(
+    router,
+    prefix="/api"
+)
+
+
+@app.get("/")
+def root():
+
+    return {
+        "application": "RAG Application",
+        "status": "running"
+    }
+
+
+---
+
+# Step 17 — Start the API
+
+Before starting, make sure Ollama is running:
+
+bash
+ollama list
+
+
+Then:
+
+bash
+uvicorn app:app --reload
+
+
+You should get:
+
+
+Uvicorn running on http://127.0.0.1:8000
+
+
+Open:
+
+
+http://127.0.0.1:8000
+
+
+Expected:
+
+json
+{
+    "application": "RAG Application",
+    "status": "running"
+}
+
+
+---
+
+# Step 18 — Test Swagger
+
+Open:
+
+
+http://127.0.0.1:8000/docs
+
+
+You'll see:
+
+
+GET  /api/health
+POST /api/ingest
+POST /api/chat
+
+
+---
+
+# Step 19 — Ingest PDF
+
+From Swagger:
+
+
+POST /api/ingest
+
+
+Choose:
+
+
+aws-data-engineering.pdf
+
+
+Execute.
+
+Internally:
+
+
+PDF
+ ↓
+PyPDFLoader
+ ↓
+Pages
+ ↓
+RecursiveCharacterTextSplitter
+ ↓
+Chunks
+ ↓
+Ollama Embedding
+ ↓
+Vectors
+ ↓
+FAISS
+ ↓
+data/vectorstore/
+
+
+---
+
+# Step 20 — Ask a question
+
+Swagger:
+
+
+POST /api/chat
+
+
+Request:
+
+json
+{
+    "question": "What is Amazon S3?"
+}
+
+
+The execution becomes:
+
+
+User Question
+      ↓
+Embedding Model
+      ↓
+Query Vector
+      ↓
+FAISS
+      ↓
+Top 4 Chunks
+      ↓
+Context
+      ↓
+Prompt
+      ↓
+Ollama LLM
+      ↓
+Answer
+
+
+Example response:
+
+json
+{
+    "answer": "Amazon S3 is an object storage service...",
+    "sources": [
+        {
+            "page": 12,
+            "source": "aws-data-engineering.pdf"
+        }
+    ]
+}
+
+
+---
+
+# Step 21 — Streamlit frontend
+
+Create:
+
+
+frontend/streamlit_app.py
+
+
+
+import requests
+import streamlit as st
+
+
+API_URL = "http://127.0.0.1:8000/api"
+
+
+st.set_page_config(
+    page_title="RAG Chatbot",
+    page_icon="🤖"
+)
+
+
+st.title("🤖 Enterprise RAG Chatbot")
+
+
+st.header("Upload Document")
+
+uploaded_file = st.file_uploader(
+    "Upload PDF",
+    type=["pdf"]
+)
+
+
+if uploaded_file:
+
+    if st.button("Ingest Document"):
+
+        files = {
+            "file": (
+                uploaded_file.name,
+                uploaded_file.getvalue(),
+                "application/pdf"
+            )
+        }
+
+        response = requests.post(
+            f"{API_URL}/ingest",
+            files=files
+        )
+
+        if response.status_code == 200:
+
+            st.success(
+                "Document ingested successfully!"
+            )
+
+        else:
+
+            st.error(response.text)
+
+
+st.header("Ask Question")
+
+question = st.text_input(
+    "Enter your question"
+)
+
+
+if st.button("Ask"):
+
+    if not question:
+
+        st.warning("Please enter a question.")
+
+    else:
+
+        response = requests.post(
+            f"{API_URL}/chat",
+            json={
+                "question": question
+            }
+        )
+
+        if response.status_code == 200:
+
+            result = response.json()
+
+            st.subheader("Answer")
+
+            st.write(
+                result["answer"]
+            )
+
+            st.subheader("Sources")
+
+            for source in result["sources"]:
+
+                st.write(source)
+
+        else:
+
+            st.error(response.text)
+
+
+Start it in another terminal:
+
+bash
+source ./venv/Scripts/activate
+
+
+Then:
+
+bash
+streamlit run frontend/streamlit_app.py
+
+
+Now you have:
+
+
+Browser
+   │
+   ▼
+Streamlit
+   │
+   ▼
+FastAPI
+   │
+   ▼
+RAG Service
+   │
+   ├── Retrieval
+   │      ↓
+   │    FAISS
+   │
+   └── Generation
+          ↓
+        Ollama
+
+
+---
+
+# Step 22 — What we have built
+
+At this point, this is a **working basic RAG application**:
+
+### Ingestion
+
+
+PDF
+ ↓
+Loader
+ ↓
+Chunking
+ ↓
+Embedding
+ ↓
+FAISS
+
+
+### Retrieval
+
+
+Question
+ ↓
+Embedding
+ ↓
+Similarity Search
+ ↓
+Top-K chunks
+
+
+### Generation
+
+
+Chunks
+ ↓
+Context
+ ↓
+Prompt
+ ↓
+LLM
+ ↓
+Answer
+
+
+---
+
+# Step 23 — But this is not yet production-grade
+
+As a GenAI Engineer, I would **not stop here**.
+
+For an enterprise RAG application, I would add:
+
+
+                    ┌────────────────────┐
+                    │    User / UI       │
+                    └─────────┬──────────┘
+                              │
+                              ▼
+                    ┌────────────────────┐
+                    │    FastAPI API     │
+                    └─────────┬──────────┘
+                              │
+                 ┌────────────┴─────────────┐
+                 │                          │
+                 ▼                          ▼
+          Authentication              Rate Limiting
+                 │
+                 ▼
+             RAG Service
+                 │
+        ┌────────┼────────┐
+        │        │        │
+        ▼        ▼        ▼
+     Query    Retrieval  Prompt
+     Rewrite  + Rerank   Management
+        │        │        │
+        └────────┼────────┘
+                 ▼
+          Vector Database
+                 │
+                 ▼
+             Context
+                 │
+                 ▼
+             LLM Layer
+                 │
+        ┌────────┼────────┐
+        ▼        ▼        ▼
+      Retry    Timeout   Fallback
+                 │
+                 ▼
+              Answer
+                 │
+        ┌────────┼────────┐
+        ▼        ▼        ▼
+     Sources   Logging   Metrics
+
+
+The next production features I recommend implementing **in this order** are:
+
+1. **Metadata filtering**
+2. **Similarity score threshold**
+3. **Reranking**
+4. **Hybrid search**
+5. **Query rewriting**
+6. **Conversation memory**
+7. **Streaming responses**
+8. **Redis caching**
+9. **PostgreSQL conversation storage**
+10. **Authentication / authorization**
+11. **Rate limiting**
+12. **Retry + exponential backoff**
+13. **Token/cost tracking**
+14. **Prompt versioning**
+15. **Structured logging**
+16. **Prometheus/Grafana monitoring**
+17. **Evaluation dataset**
+18. **RAGAS-style evaluation**
+19. **Dockerization**
+20. **AWS deployment**
+
+That progression will take this from a **basic RAG demo → production-style GenAI application**, and it also gives you excellent material for your **4+ years GenAI interview scenario questions**.
+
+
+======================================================
+
+=====================================================
+
+
+Sure. Here is a simple **English story for reading practice**, followed by questions and answers.
+
+## The Helpful Boy
+
+Rahul was a young boy who lived in a small village with his parents. He was twelve years old and studied in the village school. Rahul was a kind and helpful boy. He always helped his parents and neighbors whenever they needed him.
+
+One morning, Rahul was walking to school. On the way, he saw an old man carrying a heavy bag. The old man looked tired and was walking very slowly.
+
+Rahul went to him and said, “Sir, can I help you carry your bag?”
+
+The old man smiled and said, “Thank you, my boy. That would be very helpful.”
+
+Rahul carried the bag for the old man and walked with him until they reached his house. The old man thanked Rahul and blessed him.
+
+Rahul then continued walking to school. He arrived a little late, but his teacher did not get angry when Rahul explained what had happened.
+
+The teacher said, “You did the right thing, Rahul. Helping someone who needs you is more important than being a few minutes late.”
+
+Rahul felt very happy. From that day, he continued helping people whenever he could.
+
+### Questions and Answers
+
+**1. How old was Rahul?**
+Rahul was twelve years old.
+
+**2. Where did Rahul live?**
+Rahul lived in a small village.
+
+**3. What kind of boy was Rahul?**
+Rahul was a kind and helpful boy.
+
+**4. Where was Rahul going one morning?**
+Rahul was going to school.
+
+**5. Whom did Rahul meet on the way?**
+Rahul met an old man.
+
+**6. What was the old man carrying?**
+The old man was carrying a heavy bag.
+
+**7. Why did Rahul help the old man?**
+Rahul helped the old man because he looked tired and needed help.
+
+**8. Where did Rahul carry the bag?**
+Rahul carried the bag to the old man's house.
+
+**9. Why was Rahul late to school?**
+Rahul was late because he helped the old man.
+
+**10. Did the teacher get angry with Rahul?**
+No, the teacher did not get angry with Rahul.
+
+**11. What did the teacher tell Rahul?**
+The teacher told Rahul that helping someone was more important than being a few minutes late.
+
+**12. What is the moral of the story?**
+The moral is: **We should always help people who need our help.**
+
+### Practice Questions — Try Yourself
+
+1. Who was Rahul?
+2. What did Rahul see on his way to school?
+3. How did Rahul help the old man?
+4. Why did Rahul arrive late at school?
+5. What did the teacher say?
+6. How did Rahul feel after helping the old man?
+7. What can we learn from Rahul?
+8. Would you help an old person carrying a heavy bag? Why?
+9. What is the main lesson of the story?
+10. Give a suitable title for the story.
+
+
+================================
+

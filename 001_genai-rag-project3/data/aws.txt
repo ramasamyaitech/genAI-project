@@ -1,0 +1,12 @@
+Amazon S3 is an object storage service provided by AWS.
+It is used to store files, images, videos, documents, and backups.
+S3 provides high durability and scalability.
+
+Amazon EC2 is a cloud computing service.
+It provides virtual servers that can run applications.
+
+AWS Lambda is a serverless compute service.
+It allows developers to run code without managing servers.
+
+Amazon RDS is a managed relational database service.
+It supports database engines such as MySQL and PostgreSQL.
