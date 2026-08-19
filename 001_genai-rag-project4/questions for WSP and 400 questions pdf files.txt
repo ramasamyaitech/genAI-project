@@ -1,0 +1,224 @@
+If you are testing your **Investment Banking RAG application**, you should ask questions that test different parts of retrieval—not only simple questions.
+
+Based on your uploaded investment-banking material, here are good questions to test.
+
+### 1. Basic retrieval questions
+
+1. What are the three major financial statements?
+2. What does the Income Statement show?
+3. What does the Balance Sheet show?
+4. What does the Cash Flow Statement show?
+5. How do the three financial statements link together?
+6. What is Working Capital?
+7. What is the formula for Enterprise Value?
+8. What are the three major valuation methodologies?
+9. What is the difference between Equity Value and Enterprise Value?
+10. What is Goodwill?
+
+These test whether your RAG can retrieve **direct factual information**. 
+
+### 2. Scenario-based questions
+
+These are much better for testing RAG.
+
+11. If Depreciation increases by $10 and the tax rate is 40%, how does it affect all three financial statements?
+
+12. If Inventory increases by $10 and the company pays cash, what happens to the three statements?
+
+13. If a company buys $100 of factories using debt, how are the three financial statements affected?
+
+14. If the factories depreciate by 10% and the debt has a 10% interest rate, what happens after one year?
+
+15. If a company sells inventory for $20 that originally cost $10, how does the transaction affect the three statements?
+
+16. What happens when a company writes down an asset by $100?
+
+17. What happens when a company's debt is written down by $100?
+
+18. Can a company have negative Shareholders' Equity? What could cause it?
+
+19. Can a company have negative Enterprise Value? What would that indicate?
+
+20. Why might a company with positive EBITDA still go bankrupt?
+
+These test whether your RAG retrieves **multiple related pieces of context and combines them correctly**. 
+
+### 3. Comparison questions
+
+21. What is the difference between Accounts Receivable and Deferred Revenue?
+
+22. What is the difference between cash-based and accrual accounting?
+
+23. What is the difference between LIFO and FIFO?
+
+24. What is the difference between Enterprise Value and Equity Value?
+
+25. What is the difference between EV/EBITDA and P/E?
+
+26. What is the difference between a DCF and an LBO valuation?
+
+27. What is the difference between Comparable Companies and Precedent Transactions?
+
+28. What is the difference between operating leases and capital leases?
+
+29. What is the difference between GAAP accounting and tax accounting?
+
+30. What is the difference between Unlevered FCF and Levered FCF?
+
+These are useful for testing **semantic retrieval** rather than exact keyword matching.
+
+### 4. Advanced RAG questions
+
+31. Why is Enterprise Value used with EBITDA instead of Equity Value?
+
+32. Why are banks generally valued differently from non-financial companies?
+
+33. Why is a traditional DCF generally not appropriate for banks?
+
+34. How would you value a bank or financial institution?
+
+35. What valuation methodologies can be used for a private company?
+
+36. Why might precedent transactions produce a higher valuation than comparable companies?
+
+37. What factors could cause two companies with identical financial profiles to have different acquisition multiples?
+
+38. How do you select comparable companies?
+
+39. When would you use a Sum-of-the-Parts valuation?
+
+40. When would you use a Liquidation Valuation?
+
+### 5. Very good questions for testing your RAG's "I don't know" behavior
+
+These are **especially important**.
+
+Ask something that is not in your PDF:
+
+> What was JPMorgan's revenue in Q2 2026?
+
+> What is Apple's current stock price?
+
+> What was the largest M&A transaction announced in July 2026?
+
+> What is today's S&P 500 value?
+
+Your RAG should **not hallucinate**.
+
+It should respond according to your prompt, for example:
+
+> **The information is not available in the provided context.**
+
+### 6. Best 10 questions for your current RAG demo
+
+If you're demonstrating your project in an interview, I would use these:
+
+| #  | Question                                                                          | RAG Test              |
+| -- | --------------------------------------------------------------------------------- | --------------------- |
+| 1  | What are the three financial statements?                                          | Basic retrieval       |
+| 2  | How do the three financial statements link together?                              | Multi-concept         |
+| 3  | What happens if depreciation increases by $10?                                    | Reasoning             |
+| 4  | What happens if inventory increases by $10?                                       | Scenario              |
+| 5  | What is Enterprise Value and how is it calculated?                                | Formula retrieval     |
+| 6  | Why do we subtract cash from Enterprise Value?                                    | Conceptual            |
+| 7  | What are the three major valuation methodologies?                                 | Direct retrieval      |
+| 8  | Why would you not use a DCF for a bank?                                           | Domain reasoning      |
+| 9  | How would you value a bank?                                                       | Advanced retrieval    |
+| 10 | What should you do if the required information is not available in the documents? | Hallucination control |
+
+
+
+
+
+
+===========================================================
+
+
+
+
+
+===========================================================
+
+
+
+
+
+Yes. Since your RAG is for **investment banking**, you should test it with questions that require retrieval from the uploaded investment-banking material. The document covers accounting, Enterprise/Equity Value, valuation, DCF, merger models, LBOs, and more. 
+
+### Good RAG questions to test
+
+**Beginner / retrieval test**
+
+1. What are the three major financial statements?
+2. How do the three financial statements link together?
+3. What is Working Capital?
+4. What is the difference between Accounts Receivable and Deferred Revenue?
+5. What is the difference between cash-based and accrual accounting?
+6. When should a purchase be capitalized instead of expensed?
+7. What is Goodwill?
+8. What is the difference between LIFO and FIFO?
+
+**Scenario-based questions — very good for RAG**
+9. If depreciation increases by $10, what happens to all three financial statements?
+10. If inventory increases by $10 and is paid for with cash, what happens to the three statements?
+11. A company buys $100 million of factories using debt. How are the three statements affected?
+12. A company has positive EBITDA for 10 years but goes bankrupt. How could that happen?
+13. What happens when a company writes down an asset by $100?
+14. What happens when a company's debt is written down by $100?
+15. A company receives $100 million from the government as an equity investment. How do the three statements change?
+
+**Valuation questions**
+16. What are the three major valuation methodologies?
+17. When would you not use a DCF?
+18. What is the Enterprise Value formula?
+19. Why is cash subtracted when calculating Enterprise Value?
+20. What is the difference between Enterprise Value and Equity Value?
+21. How do you calculate fully diluted shares?
+22. What is the Treasury Stock Method?
+23. What are the most common valuation multiples?
+24. How do you select comparable companies?
+25. What are the weaknesses of public company comparables?
+26. What are the weaknesses of precedent transactions?
+27. How would you value a private company?
+28. How would you value a bank differently from a normal company?
+
+**Advanced RAG questions**
+29. Why would Precedent Transactions usually produce a higher valuation than Comparable Companies?
+30. When might a DCF produce a higher valuation than an LBO?
+31. Why can't you use Equity Value / EBITDA?
+32. When would you use Sum-of-the-Parts valuation?
+33. How do NOLs affect the three financial statements?
+34. What are Deferred Tax Assets and Deferred Tax Liabilities?
+35. How do you project Accounts Receivable and Accounts Payable in a three-statement model?
+
+### 🔥 Best questions for testing whether your RAG actually works
+
+Try questions that require **multiple pieces of retrieved context**:
+
+> **"If depreciation increases by $10 and the tax rate is 40%, walk me through the impact on the Income Statement, Cash Flow Statement, and Balance Sheet."**
+
+Your RAG should retrieve the relevant accounting section and explain the calculation. The document specifically gives this scenario. 
+
+Another excellent test:
+
+> **"A company has positive EBITDA for 10 years but goes bankrupt. Give me the possible reasons."**
+
+The source identifies excessive CapEx, high interest expense, debt maturity/refinancing problems, and significant one-time charges. 
+
+And for valuation:
+
+> **"What are the three major valuation methodologies, and when would you avoid using a DCF?"**
+
+The source identifies Comparable Companies, Precedent Transactions, and DCF, and explains situations where DCF is inappropriate. 
+
+### 🚫 Very important RAG test
+
+Also ask something **not contained in the PDF**, for example:
+
+> **"What was Apple's revenue in 2025?"**
+
+Your RAG should **not invent an answer**. It should respond according to your prompt, such as:
+
+> **"The information is not available in the provided context."**
+
+This is one of the most important tests for your `RAG_PROMPT`: **answer from retrieved context only, otherwise explicitly say the information is unavailable.**

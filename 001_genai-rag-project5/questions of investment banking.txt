@@ -1,0 +1,292 @@
+For your **RAG application**, these are good questions to test whether the system is retrieving the correct information from the 300-line Investment Banking knowledge document.
+
+### Basic questions
+
+1. What is investment banking?
+2. What services do investment banks provide?
+3. What does M&A stand for?
+4. What is the difference between a merger and an acquisition?
+5. Who is the acquirer in an acquisition?
+6. What is a target company?
+7. What is a strategic buyer?
+8. What is a financial buyer?
+9. What is a pitch book?
+10. What is a CIM?
+11. What is due diligence?
+12. What is financial due diligence?
+13. What is legal due diligence?
+14. What is commercial due diligence?
+15. What is operational due diligence?
+
+### Valuation questions
+
+16. What is enterprise value?
+17. What is equity value?
+18. How is market capitalization calculated?
+19. What is the difference between enterprise value and equity value?
+20. What is EBITDA?
+21. What is EBIT?
+22. What is EV/EBITDA?
+23. What is the P/E ratio?
+24. What is gross margin?
+25. What is operating margin?
+26. What is net margin?
+27. What is free cash flow?
+28. What is CapEx?
+29. What is working capital?
+30. What is the cash conversion cycle?
+
+### DCF questions
+
+31. What is DCF valuation?
+32. How does a DCF valuation work?
+33. What is WACC?
+34. What is the cost of equity?
+35. What is the cost of debt?
+36. What is terminal value?
+37. What is the perpetual growth method?
+38. What is the exit multiple method?
+39. How does a higher discount rate affect valuation?
+40. How does a higher growth rate affect terminal value?
+41. Why is sensitivity analysis used in DCF valuation?
+42. What variables are commonly used in a DCF sensitivity table?
+
+### Comparable valuation
+
+43. What are trading comparables?
+44. What are precedent transactions?
+45. What is the difference between trading comparables and precedent transactions?
+46. How are comparable companies selected?
+47. What is a control premium?
+48. What is an unaffected share price?
+49. What is a fairness opinion?
+50. What is accretion and dilution analysis?
+
+### M&A questions
+
+51. What is an accretive acquisition?
+52. What is a dilutive acquisition?
+53. What is purchase price allocation?
+54. What is goodwill?
+55. What are synergies?
+56. What are revenue synergies?
+57. What are cost synergies?
+58. What is integration risk?
+59. What is the difference between signing and closing?
+60. What are conditions precedent?
+61. What is antitrust review?
+62. What are representations and warranties?
+63. What are transaction covenants?
+64. What is a termination fee?
+65. What is a reverse termination fee?
+
+### M&A process questions
+
+66. What happens during a sell-side process?
+67. What is an NDA?
+68. Why is an NDA required in an M&A transaction?
+69. What happens after a buyer signs an NDA?
+70. What is a management presentation?
+71. What is a virtual data room?
+72. What is an indication of interest?
+73. How does a seller select a preferred bidder?
+74. What factors determine transaction certainty?
+75. Why is due diligence important before completing an acquisition?
+
+### Debt and financing questions
+
+76. What is debt financing?
+77. What is equity financing?
+78. What is a corporate bond?
+79. What is principal?
+80. What is a bond coupon?
+81. What is bond maturity?
+82. What is yield?
+83. What is a credit spread?
+84. What is investment-grade debt?
+85. What is high-yield debt?
+86. Why does high-yield debt generally have a higher yield?
+87. What is leverage?
+88. What is the debt-to-EBITDA ratio?
+89. What is interest coverage?
+90. What is debt capacity?
+
+### Lending questions
+
+91. What factors do lenders evaluate?
+92. What is senior debt?
+93. What is subordinated debt?
+94. What is secured debt?
+95. What is unsecured debt?
+96. What is a revolving credit facility?
+97. What is a term loan?
+98. What is amortization?
+99. What is bullet repayment?
+100. What are debt covenants?
+101. What are maintenance covenants?
+102. What are incurrence covenants?
+103. What happens when a borrower breaches a covenant?
+
+### LBO questions
+
+104. What does LBO stand for?
+105. What is a leveraged buyout?
+106. Why do private equity firms use LBO structures?
+107. What factors affect LBO returns?
+108. What is entry enterprise value?
+109. What is exit enterprise value?
+110. What is sponsor equity?
+111. How does debt financing affect sponsor equity?
+112. How can debt repayment increase equity value?
+113. What is IRR?
+114. What is MOIC?
+115. What is multiple expansion?
+116. What is multiple compression?
+117. What is management rollover?
+118. What is a management incentive plan?
+119. What are the major components of an LBO model?
+
+### Equity and capital markets
+
+120. What does ECM stand for?
+121. What does DCM stand for?
+122. What is an IPO?
+123. What is a follow-on offering?
+124. What is a secondary offering?
+125. What is a primary equity offering?
+126. What is bookbuilding?
+127. What is an underwriting syndicate?
+128. What is a prospectus?
+129. What is free float?
+130. What is EPS?
+131. How is EPS calculated?
+132. What is ROE?
+133. What is ROIC?
+134. How can a company improve ROIC?
+
+### Financial modeling
+
+135. Why is financial modeling important in investment banking?
+136. What is a three-statement model?
+137. Which three financial statements are connected in a three-statement model?
+138. How are revenue assumptions created?
+139. How can expenses be forecast?
+140. How is depreciation modeled?
+141. How is interest expense modeled?
+142. What is cash flow from operations?
+143. What is cash flow from investing?
+144. What is cash flow from financing?
+145. Why must the balance sheet remain balanced?
+146. Why should historical financial data be validated?
+147. What are model checks?
+148. What is a circular reference?
+149. What is scenario analysis?
+150. What is a base-case scenario?
+151. What is an upside scenario?
+152. What is a downside scenario?
+
+### Risk and compliance
+
+153. What is market risk?
+154. What is credit risk?
+155. What is liquidity risk?
+156. What is operational risk?
+157. What is legal risk?
+158. What is regulatory risk?
+159. What is country risk?
+160. What is currency risk?
+161. What is interest-rate risk?
+162. How can financial risks be reduced?
+163. What is hedging?
+164. What are derivatives?
+165. What is a forward contract?
+166. What is an option?
+167. What is a swap?
+
+### KYC and AML
+
+168. What does KYC stand for?
+169. Why are KYC procedures important?
+170. What does AML stand for?
+171. What is the purpose of AML controls?
+172. What is customer due diligence?
+173. What happens when a suspicious transaction is identified?
+174. Why is confidentiality important in investment banking?
+175. What is insider trading?
+176. What is material non-public information?
+177. What are information barriers?
+178. What are conflicts of interest?
+179. What are Chinese walls?
+
+### Scenario-based RAG questions
+
+These are especially useful because they test whether your RAG retrieves **multiple relevant chunks** rather than just matching keywords.
+
+180. A company has increasing revenue but declining margins. What could be causing the decline in profitability?
+181. A company has high debt and low EBITDA. Which financial risk should an analyst focus on?
+182. An acquisition increases the buyer's EPS. What is this type of acquisition called?
+183. A company wants to acquire a competitor to reduce duplicated costs. What type of synergy is this?
+184. A private equity firm wants to maximize returns using debt. Which transaction structure would it consider?
+185. A buyer wants detailed information about a target before making an acquisition. Which process should the buyer perform?
+186. A company is preparing to sell itself to potential buyers. What documents and processes might be involved?
+187. A company's WACC increases significantly. What would likely happen to its DCF valuation?
+188. A company is being valued using similar publicly traded companies. Which valuation method is being used?
+189. A company is being valued using previous acquisition transactions. Which valuation method is being used?
+190. A lender wants to determine whether a borrower can repay its debt. Which financial metrics should it examine?
+191. A private equity investor buys a company using substantial debt. What type of transaction is this?
+192. A company wants to raise money by selling shares to the public for the first time. What transaction is this?
+193. A company wants to raise debt from investors. Which investment banking team would typically advise it?
+194. A company wants to issue new equity. Which capital-markets team would typically advise it?
+195. A company has strong EBITDA growth and is paying down debt. How could this affect an LBO investor's returns?
+196. A company has a large amount of accounts receivable. Which working-capital issue should management monitor?
+197. A company cannot meet its short-term financial obligations. Which type of risk does this represent?
+198. A bank wants to verify the identity of a customer. Which compliance process should it use?
+199. A financial institution detects an unusual transaction. Which financial crime control may become relevant?
+200. An investment banker receives confidential information about an upcoming acquisition. Why must the banker protect this information?
+
+### Multi-hop questions
+
+201. How can EBITDA growth, debt repayment, and exit multiple expansion together affect LBO returns?
+202. How do WACC and terminal growth rate affect DCF valuation?
+203. How do enterprise value, EBITDA, and EV/EBITDA relate to each other?
+204. How do revenue synergies and cost synergies contribute to acquisition value?
+205. How can working-capital improvements increase free cash flow?
+206. How can leverage affect both risk and equity returns in an LBO?
+207. How do debt capacity, interest coverage, and debt-to-EBITDA relate to lending decisions?
+208. How can integration risk reduce the value of expected M&A synergies?
+209. How can a control premium affect the purchase price in an acquisition?
+210. How can purchase price allocation affect the accounting treatment of an acquisition?
+
+### Questions where the answer should NOT be available
+
+These are important for testing your RAG's **"I don't know" / hallucination prevention** behavior.
+
+211. What was Apple's revenue in 2025?
+212. What was JPMorgan's net income in 2025?
+213. What is the current share price of Microsoft?
+214. What is today's S&P 500 index level?
+215. What is India's current GDP?
+216. Who is the current CEO of Goldman Sachs?
+217. What was the largest M&A transaction in 2025?
+218. What is the current interest rate in the United States?
+219. What is the current USD to INR exchange rate?
+220. Which investment bank has the highest revenue in 2026?
+
+For these questions, your RAG prompt should ideally respond that **the information is not available in the provided context**, rather than inventing an answer.
+
+### Best 10 questions for your first RAG test
+
+Start with these:
+
+1. What is the difference between enterprise value and equity value?
+2. What is the difference between trading comparables and precedent transactions?
+3. How does a DCF valuation work?
+4. How does a higher WACC affect DCF valuation?
+5. What are revenue and cost synergies?
+6. What is an accretive acquisition?
+7. What is the difference between senior and subordinated debt?
+8. What factors affect LBO returns?
+9. What is the difference between IRR and MOIC?
+10. How can working-capital improvements increase free cash flow?
+
+These give you a good mix of **definition, comparison, reasoning, and multi-chunk retrieval** tests.
