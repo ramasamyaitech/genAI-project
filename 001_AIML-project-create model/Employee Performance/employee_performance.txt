@@ -1,0 +1,627 @@
+Great! Since you're **new to Machine Learning**, let's build a complete project from scratch using your dataset.
+
+We will predict the **PerformanceScore** of an employee based on:
+
+* Age
+* Experience
+* Department
+* ProjectsCompleted
+
+This is called **Regression**, because PerformanceScore is a number.
+
+---
+
+# Step 1: Install Required Libraries
+
+Open Command Prompt or Terminal.
+
+
+pip install pandas numpy scikit-learn matplotlib seaborn
+
+
+---
+
+# Step 2: Create Dataset
+
+Create a file called **employee.csv**
+
+Paste your data.
+
+csv
+EmployeeID,Age,Experience,Department,ProjectsCompleted,PerformanceScore
+E001,25,2,IT,3,72
+E002,30,5,HR,6,85
+E003,28,4,Finance,5,80
+E004,35,8,IT,10,95
+E005,40,12,Sales,15,98
+E006,26,3,IT,4,75
+E007,32,6,Finance,8,88
+E008,29,5,Sales,6,82
+E009,45,15,HR,18,99
+E010,38,10,IT,12,93
+E011,27,2,Finance,3,70
+E012,31,7,Sales,9,89
+E013,36,11,IT,14,96
+E014,42,16,HR,20,100
+E015,24,1,IT,2,68
+
+
+---
+
+# Step 3: Import Libraries
+
+
+import pandas as pd
+import numpy as np
+
+
+### Explanation
+
+`pandas`
+
+* Reads CSV files
+* Handles tables
+
+`numpy`
+
+* Mathematical calculations
+
+---
+
+# Step 4: Load Dataset
+
+
+df = pd.read_csv("employee_performance.csv")
+
+
+Display data.
+
+
+print(df)
+
+
+Output
+
+
+EmployeeID Age Experience Department ProjectsCompleted PerformanceScore
+
+
+---
+
+# Step 5: Understand the Dataset
+
+View first 5 rows.
+
+
+print(df.head())
+
+
+Last 5 rows
+
+
+print(df.tail())
+
+
+Shape
+
+
+print(df.shape)
+
+
+Output
+
+
+(15,6)
+
+
+Meaning
+
+
+15 Rows
+6 Columns
+
+
+Column Names
+
+
+print(df.columns)
+
+
+---
+
+# Step 6: Check Data Types
+
+
+print(df.dtypes)
+
+
+Output
+
+
+Age int64
+Experience int64
+Department object
+PerformanceScore int64
+
+
+Notice
+
+Department is **text**
+
+Machine Learning cannot understand text.
+
+We must convert it into numbers.
+
+---
+
+# Step 7: Check Missing Values
+
+
+print(df.isnull().sum())
+
+
+Output
+
+
+0
+
+
+No missing values.
+
+---
+
+# Step 8: Remove Unnecessary Column
+
+EmployeeID has no effect on prediction.
+
+
+df = df.drop(columns="EmployeeID")
+
+
+Now
+
+
+Age
+Experience
+Department
+ProjectsCompleted
+PerformanceScore
+
+
+---
+
+# Step 9: Convert Department into Numbers
+
+Current
+
+
+IT
+HR
+Finance
+Sales
+
+
+Machine learning wants
+
+
+IT -> 2
+HR ->1
+Finance ->0
+Sales ->3
+
+
+Use One-Hot Encoding.
+
+
+df = pd.get_dummies(df, columns=["Department"])
+
+
+Now dataset becomes
+
+
+Age
+Experience
+ProjectsCompleted
+PerformanceScore
+Department_Finance
+Department_HR
+Department_IT
+Department_Sales
+
+
+Everything is numeric.
+
+---
+
+# Step 10: Separate Features and Target
+
+Features
+
+
+Age
+Experience
+ProjectsCompleted
+Department
+
+
+Target
+
+
+PerformanceScore
+
+
+Code
+
+
+X = df.drop("PerformanceScore", axis=1)
+
+y = df["PerformanceScore"]
+
+
+---
+
+# Step 11: Split Dataset
+
+Training Data
+
+80%
+
+Testing Data
+
+20%
+
+
+from sklearn.model_selection import train_test_split
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.2,
+    random_state=42
+)
+
+
+Suppose
+
+
+15 rows
+
+
+Training
+
+
+12 rows
+
+
+Testing
+
+
+3 rows
+
+
+---
+
+# Step 12: Select ML Algorithm
+
+We'll use
+
+**Linear Regression**
+
+
+from sklearn.linear_model import LinearRegression
+
+model = LinearRegression()
+
+
+---
+
+# Step 13: Train the Model
+
+
+model.fit(X_train, y_train)
+
+
+This is the learning step.
+
+The model learns patterns like
+
+
+More experience
+↓
+
+Higher Performance Score
+
+
+---
+
+# Step 14: Predict
+
+
+predictions = model.predict(X_test)
+
+
+Print predictions
+
+
+print(predictions)
+
+
+Example
+
+
+89.5
+97.2
+73.4
+
+
+---
+
+# Step 15: Compare Prediction
+
+
+result = pd.DataFrame({
+    "Actual": y_test,
+    "Predicted": predictions
+})
+
+print(result)
+
+
+Example
+
+
+Actual  Predicted
+
+93      92.4
+68      69.1
+99      98.5
+
+
+---
+
+# Step 16: Evaluate Model
+
+Mean Absolute Error
+
+
+from sklearn.metrics import mean_absolute_error
+
+mae = mean_absolute_error(y_test, predictions)
+
+print(mae)
+
+
+Suppose
+
+
+1.5
+
+
+Means
+
+On average
+
+Prediction differs by only
+
+
+1.5 marks
+
+
+---
+
+Mean Squared Error
+
+
+from sklearn.metrics import mean_squared_error
+
+mse = mean_squared_error(y_test, predictions)
+
+print(mse)
+
+
+---
+
+R² Score
+
+
+from sklearn.metrics import r2_score
+
+score = r2_score(y_test, predictions)
+
+print(score)
+
+
+Suppose
+
+
+0.96
+
+
+Meaning
+
+
+96% accurate fit
+
+
+---
+
+# Step 17: Predict a New Employee
+
+Suppose
+
+
+Age = 29
+Experience = 5
+ProjectsCompleted = 7
+Department = IT
+
+
+Remember the department columns:
+
+
+Department_Finance
+Department_HR
+Department_IT
+Department_Sales
+
+
+For IT
+
+
+Finance = 0
+HR = 0
+IT = 1
+Sales = 0
+
+
+Code
+
+
+new_employee = [[29, 5, 7, 0, 0, 1, 0]]
+
+prediction = model.predict(new_employee)
+
+print("Predicted Performance Score:", prediction)
+
+
+Example
+
+
+86.7
+
+
+---
+
+# Step 18: Save the Model
+
+
+import joblib
+
+joblib.dump(model, "employee_model.pkl")
+
+
+Saved
+
+
+employee_model.pkl
+
+
+---
+
+# Step 19: Load Saved Model
+
+
+loaded_model = joblib.load("employee_model.pkl")
+
+
+Predict again
+
+
+loaded_model.predict(new_employee)
+
+
+---
+
+# Complete Workflow
+
+
+employee.csv
+      │
+      ▼
+Read CSV
+      │
+      ▼
+Explore Data
+      │
+      ▼
+Clean Data
+      │
+      ▼
+Encode Department
+      │
+      ▼
+Split X and y
+      │
+      ▼
+Train/Test Split
+      │
+      ▼
+Choose Algorithm
+      │
+      ▼
+Train Model
+      │
+      ▼
+Predict
+      │
+      ▼
+Evaluate Accuracy
+      │
+      ▼
+Save Model (.pkl)
+      │
+      ▼
+Load Model
+      │
+      ▼
+Predict New Employee
+
+
+## Complete Code
+
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+import joblib
+
+# Load data
+df = pd.read_csv("employee.csv")
+
+# Remove ID column
+df = df.drop("EmployeeID", axis=1)
+
+# Convert Department to numeric columns
+df = pd.get_dummies(df, columns=["Department"])
+
+# Features and Target
+X = df.drop("PerformanceScore", axis=1)
+y = df["PerformanceScore"]
+
+# Split data
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# Train model
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# Predict
+predictions = model.predict(X_test)
+
+# Evaluation
+print("MAE:", mean_absolute_error(y_test, predictions))
+print("MSE:", mean_squared_error(y_test, predictions))
+print("R2 Score:", r2_score(y_test, predictions))
+
+# Save model
+joblib.dump(model, "employee_model.pkl")
+
+# Predict a new employee
+new_employee = pd.DataFrame([{
+    "Age": 29,
+    "Experience": 5,
+    "ProjectsCompleted": 7,
+    "Department_Finance": 0,
+    "Department_HR": 0,
+    "Department_IT": 1,
+    "Department_Sales": 0
+}])
+
+prediction = model.predict(new_employee)
+print("Predicted Performance Score:", prediction[0])
+
+
+After you've understood this basic workflow, the next step is to learn **why each line of code works internally** (what `fit()`, `predict()`, `train_test_split()`, one-hot encoding, and evaluation metrics actually do). That foundation makes it much easier to answer machine learning interview questions and build more advanced models such as Decision Trees, Random Forests, and XGBoost.

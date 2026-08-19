@@ -1,0 +1,612 @@
+This is also a **Classification** problem because the target column is:
+
+```text
+Attrition
+```
+
+Possible values:
+
+```text
+Yes
+No
+```
+
+We want to predict whether an employee **will leave the company (Yes)** or **stay (No)**.
+
+---
+
+# Step 1: Install Required Libraries
+
+```bash
+pip install pandas numpy scikit-learn matplotlib seaborn joblib
+```
+
+### Explanation
+
+* **pandas** → Read and manipulate data
+* **numpy** → Numerical operations
+* **scikit-learn** → Machine Learning algorithms
+* **matplotlib** → Visualization
+* **seaborn** → Visualization
+* **joblib** → Save and load models
+
+---
+
+# Step 2: Create Dataset
+
+Save the data as **employee_attrition.csv**
+
+```csv
+Age,Salary,Experience,Overtime,DistanceFromHome,Attrition
+25,35000,2,Yes,10,Yes
+30,50000,5,No,5,No
+28,42000,4,Yes,12,Yes
+40,80000,12,No,4,No
+35,65000,8,No,6,No
+27,39000,3,Yes,15,Yes
+45,90000,18,No,3,No
+29,45000,5,Yes,14,Yes
+33,60000,7,No,8,No
+31,55000,6,No,7,No
+26,37000,2,Yes,18,Yes
+38,72000,10,No,5,No
+41,85000,15,No,4,No
+24,32000,1,Yes,20,Yes
+36,68000,9,No,6,No
+```
+
+---
+
+# Step 3: Import Libraries
+
+```python
+import pandas as pd
+import numpy as np
+```
+
+---
+
+# Step 4: Load Dataset
+
+```python
+df = pd.read_csv("employee_attrition.csv")
+```
+
+Display the dataset.
+
+```python
+print(df)
+```
+
+---
+
+# Step 5: Explore Dataset
+
+First 5 rows
+
+```python
+print(df.head())
+```
+
+Last 5 rows
+
+```python
+print(df.tail())
+```
+
+Shape
+
+```python
+print(df.shape)
+```
+
+Output
+
+```text
+(15, 6)
+```
+
+Meaning:
+
+* 15 Rows
+* 6 Columns
+
+Column Names
+
+```python
+print(df.columns)
+```
+
+---
+
+# Step 6: Check Data Types
+
+```python
+print(df.dtypes)
+```
+
+Output
+
+```text
+Age                  int64
+Salary               int64
+Experience           int64
+Overtime            object
+DistanceFromHome     int64
+Attrition           object
+```
+
+Notice:
+
+The following columns are text:
+
+```text
+Overtime
+Attrition
+```
+
+Machine Learning models require numeric values.
+
+---
+
+# Step 7: Check Missing Values
+
+```python
+print(df.isnull().sum())
+```
+
+Output
+
+```text
+Age                 0
+Salary              0
+Experience          0
+Overtime            0
+DistanceFromHome    0
+Attrition           0
+```
+
+No missing values.
+
+---
+
+# Step 8: Convert Text to Numbers
+
+Convert **Overtime**
+
+```python
+df["Overtime"] = df["Overtime"].map({
+    "Yes": 1,
+    "No": 0
+})
+```
+
+Convert **Attrition**
+
+```python
+df["Attrition"] = df["Attrition"].map({
+    "Yes": 1,
+    "No": 0
+})
+```
+
+Now
+
+| Overtime | Attrition |
+| -------- | --------- |
+| 1        | 1         |
+| 0        | 0         |
+| 1        | 1         |
+
+Meaning
+
+```text
+Yes = 1
+
+No = 0
+```
+
+Check the updated data
+
+```python
+print(df.head())
+```
+
+---
+
+# Step 9: Separate Features and Target
+
+Features
+
+```python
+X = df.drop("Attrition", axis=1)
+```
+
+Target
+
+```python
+y = df["Attrition"]
+```
+
+Features
+
+```text
+Age
+Salary
+Experience
+Overtime
+DistanceFromHome
+```
+
+Target
+
+```text
+Attrition
+```
+
+---
+
+# Step 10: Split Dataset
+
+80% Training
+
+20% Testing
+
+```python
+from sklearn.model_selection import train_test_split
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.2,
+    random_state=42
+)
+```
+
+Training
+
+```text
+12 rows
+```
+
+Testing
+
+```text
+3 rows
+```
+
+---
+
+# Step 11: Choose Algorithm
+
+Use **Logistic Regression**
+
+```python
+from sklearn.linear_model import LogisticRegression
+
+model = LogisticRegression()
+```
+
+---
+
+# Step 12: Train the Model
+
+```python
+model.fit(X_train, y_train)
+```
+
+The model learns patterns such as:
+
+* Employees working overtime may be more likely to leave.
+* Employees with higher salaries may be less likely to leave.
+* Employees living farther from work may have a higher chance of attrition.
+* More experienced employees may stay longer.
+
+---
+
+# Step 13: Predict
+
+```python
+predictions = model.predict(X_test)
+```
+
+Display predictions
+
+```python
+print(predictions)
+```
+
+Example
+
+```text
+[0 1 0]
+```
+
+Meaning
+
+```text
+0 = Employee Stays
+
+1 = Employee Leaves
+```
+
+---
+
+# Step 14: Compare Actual vs Predicted
+
+```python
+result = pd.DataFrame({
+    "Actual": y_test,
+    "Predicted": predictions
+})
+
+print(result)
+```
+
+Example
+
+| Actual | Predicted |
+| ------ | --------- |
+| 0      | 0         |
+| 1      | 1         |
+| 0      | 0         |
+
+---
+
+# Step 15: Evaluate the Model
+
+### Accuracy
+
+```python
+from sklearn.metrics import accuracy_score
+
+accuracy = accuracy_score(y_test, predictions)
+
+print("Accuracy:", accuracy)
+```
+
+Example
+
+```text
+Accuracy: 1.0
+```
+
+---
+
+### Confusion Matrix
+
+```python
+from sklearn.metrics import confusion_matrix
+
+print(confusion_matrix(y_test, predictions))
+```
+
+Example
+
+```text
+[[2 0]
+ [0 1]]
+```
+
+---
+
+### Classification Report
+
+```python
+from sklearn.metrics import classification_report
+
+print(classification_report(y_test, predictions))
+```
+
+Shows:
+
+* Precision
+* Recall
+* F1-score
+
+---
+
+# Step 16: Predict a New Employee
+
+Suppose
+
+| Field            | Value |
+| ---------------- | ----- |
+| Age              | 30    |
+| Salary           | 50000 |
+| Experience       | 5     |
+| Overtime         | Yes   |
+| DistanceFromHome | 10    |
+
+Convert Overtime
+
+```text
+Yes = 1
+```
+
+Code
+
+```python
+new_employee = pd.DataFrame([{
+    "Age": 30,
+    "Salary": 50000,
+    "Experience": 5,
+    "Overtime": 1,
+    "DistanceFromHome": 10
+}])
+
+prediction = model.predict(new_employee)
+
+if prediction[0] == 1:
+    print("Employee is likely to Leave")
+else:
+    print("Employee is likely to Stay")
+```
+
+Example Output
+
+```text
+Employee is likely to Stay
+```
+
+---
+
+# Step 17: Save the Model
+
+```python
+import joblib
+
+joblib.dump(model, "employee_attrition_model.pkl")
+```
+
+Saved file
+
+```text
+employee_attrition_model.pkl
+```
+
+---
+
+# Step 18: Load the Model
+
+```python
+loaded_model = joblib.load("employee_attrition_model.pkl")
+
+prediction = loaded_model.predict(new_employee)
+print(prediction)
+```
+
+---
+
+# Complete Workflow
+
+```text
+employee_attrition.csv
+        │
+        ▼
+Read CSV
+        │
+        ▼
+Explore Dataset
+        │
+        ▼
+Check Missing Values
+        │
+        ▼
+Convert Yes/No → 1/0
+        │
+        ▼
+Split Features (X) and Target (y)
+        │
+        ▼
+Train-Test Split
+        │
+        ▼
+Create Logistic Regression Model
+        │
+        ▼
+Train Model (fit)
+        │
+        ▼
+Predict Attrition
+        │
+        ▼
+Evaluate (Accuracy, Confusion Matrix)
+        │
+        ▼
+Save Model (.pkl)
+        │
+        ▼
+Load Model
+        │
+        ▼
+Predict New Employee
+```
+
+# Complete Code
+
+```python
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+import joblib
+
+# Load dataset
+df = pd.read_csv("employee_attrition.csv")
+
+# Convert categorical values to numeric
+df["Overtime"] = df["Overtime"].map({
+    "Yes": 1,
+    "No": 0
+})
+
+df["Attrition"] = df["Attrition"].map({
+    "Yes": 1,
+    "No": 0
+})
+
+# Features and target
+X = df.drop("Attrition", axis=1)
+y = df["Attrition"]
+
+# Split dataset
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.2,
+    random_state=42
+)
+
+# Create model
+model = LogisticRegression()
+
+# Train model
+model.fit(X_train, y_train)
+
+# Predict
+predictions = model.predict(X_test)
+
+# Evaluate
+print("Accuracy:", accuracy_score(y_test, predictions))
+print("\nConfusion Matrix:")
+print(confusion_matrix(y_test, predictions))
+print("\nClassification Report:")
+print(classification_report(y_test, predictions))
+
+# Save model
+joblib.dump(model, "employee_attrition_model.pkl")
+
+# Predict a new employee
+new_employee = pd.DataFrame([{
+    "Age": 30,
+    "Salary": 50000,
+    "Experience": 5,
+    "Overtime": 1,
+    "DistanceFromHome": 10
+}])
+
+prediction = model.predict(new_employee)
+
+if prediction[0] == 1:
+    print("Employee is likely to Leave")
+else:
+    print("Employee is likely to Stay")
+```
+
+### Interview Tip
+
+You can quickly identify the machine learning problem type by looking at the **target column**:
+
+| Target Column      | Example Values  | ML Type        | Algorithm           |
+| ------------------ | --------------- | -------------- | ------------------- |
+| `Price`            | 500000, 1200000 | Regression     | Linear Regression   |
+| `PerformanceScore` | 72, 85, 98      | Regression     | Linear Regression   |
+| `Purchased`        | Yes / No        | Classification | Logistic Regression |
+| `Default`          | Yes / No        | Classification | Logistic Regression |
+| `Attrition`        | Yes / No        | Classification | Logistic Regression |
+
+A simple rule to remember is:
+
+* **Numeric output** (continuous value) → **Regression**
+* **Category output** (Yes/No, True/False, Spam/Not Spam) → **Classification**

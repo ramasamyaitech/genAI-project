@@ -1,0 +1,623 @@
+This dataset is a **Classification** problem because the target column is:
+
+```text
+Disease
+```
+
+Possible values:
+
+```text
+Yes
+No
+```
+
+We want to predict whether a patient **has heart disease (Yes)** or **does not have heart disease (No)**.
+
+Unlike your previous datasets, this one contains a **categorical feature**:
+
+```text
+Gender
+```
+
+Since **Gender** has two values (**Male**, **Female**), we can convert it using `map()`.
+
+---
+
+# Step 1: Install Required Libraries
+
+```bash
+pip install pandas numpy scikit-learn matplotlib seaborn joblib
+```
+
+### Explanation
+
+* **pandas** → Read CSV files
+* **numpy** → Numerical operations
+* **scikit-learn** → Machine Learning
+* **matplotlib** → Charts
+* **seaborn** → Data visualization
+* **joblib** → Save and load trained models
+
+---
+
+# Step 2: Create Dataset
+
+Save as **heart_disease.csv**
+
+```csv
+Age,Gender,Cholesterol,BloodPressure,HeartRate,Disease
+45,Male,220,140,88,Yes
+38,Female,180,120,76,No
+52,Male,250,150,92,Yes
+60,Female,270,160,98,Yes
+35,Male,170,118,72,No
+48,Female,230,145,85,Yes
+29,Male,165,110,70,No
+55,Female,255,155,94,Yes
+42,Male,200,130,82,No
+63,Female,280,170,100,Yes
+39,Male,190,125,78,No
+50,Female,240,148,90,Yes
+34,Male,175,115,74,No
+58,Female,265,158,96,Yes
+46,Male,215,138,84,No
+```
+
+---
+
+# Step 3: Import Libraries
+
+```python
+import pandas as pd
+import numpy as np
+```
+
+---
+
+# Step 4: Load Dataset
+
+```python
+df = pd.read_csv("heart_disease.csv")
+```
+
+Display the data
+
+```python
+print(df)
+```
+
+---
+
+# Step 5: Explore Dataset
+
+First 5 rows
+
+```python
+print(df.head())
+```
+
+Last 5 rows
+
+```python
+print(df.tail())
+```
+
+Shape
+
+```python
+print(df.shape)
+```
+
+Output
+
+```text
+(15, 6)
+```
+
+Meaning
+
+* 15 Rows
+* 6 Columns
+
+Column names
+
+```python
+print(df.columns)
+```
+
+---
+
+# Step 6: Check Data Types
+
+```python
+print(df.dtypes)
+```
+
+Output
+
+```text
+Age               int64
+Gender           object
+Cholesterol       int64
+BloodPressure     int64
+HeartRate         int64
+Disease          object
+```
+
+Notice
+
+These columns are text.
+
+```text
+Gender
+Disease
+```
+
+Machine Learning cannot understand text.
+
+---
+
+# Step 7: Check Missing Values
+
+```python
+print(df.isnull().sum())
+```
+
+Output
+
+```text
+Age              0
+Gender           0
+Cholesterol      0
+BloodPressure    0
+HeartRate        0
+Disease          0
+```
+
+No missing values.
+
+---
+
+# Step 8: Convert Text into Numbers
+
+Convert Gender
+
+```python
+df["Gender"] = df["Gender"].map({
+    "Male":1,
+    "Female":0
+})
+```
+
+Meaning
+
+```text
+Male = 1
+
+Female = 0
+```
+
+Convert Disease
+
+```python
+df["Disease"] = df["Disease"].map({
+    "Yes":1,
+    "No":0
+})
+```
+
+Meaning
+
+```text
+Yes = 1
+
+No = 0
+```
+
+Check the updated dataset.
+
+```python
+print(df.head())
+```
+
+---
+
+# Step 9: Separate Features and Target
+
+Features
+
+```python
+X = df.drop("Disease", axis=1)
+```
+
+Target
+
+```python
+y = df["Disease"]
+```
+
+Features
+
+```text
+Age
+Gender
+Cholesterol
+BloodPressure
+HeartRate
+```
+
+Target
+
+```text
+Disease
+```
+
+---
+
+# Step 10: Split Dataset
+
+80% Training
+
+20% Testing
+
+```python
+from sklearn.model_selection import train_test_split
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.2,
+    random_state=42
+)
+```
+
+Training
+
+```text
+12 rows
+```
+
+Testing
+
+```text
+3 rows
+```
+
+---
+
+# Step 11: Choose Algorithm
+
+Use **Logistic Regression**
+
+```python
+from sklearn.linear_model import LogisticRegression
+
+model = LogisticRegression()
+```
+
+---
+
+# Step 12: Train Model
+
+```python
+model.fit(X_train, y_train)
+```
+
+The model learns relationships such as:
+
+* Higher cholesterol → Higher disease risk
+* Higher blood pressure → Higher disease risk
+* Higher heart rate → May indicate higher risk
+* Age may influence disease probability
+
+---
+
+# Step 13: Predict
+
+```python
+predictions = model.predict(X_test)
+
+print(predictions)
+```
+
+Example
+
+```text
+[1 0 1]
+```
+
+Meaning
+
+```text
+1 = Disease
+
+0 = No Disease
+```
+
+---
+
+# Step 14: Compare Actual vs Predicted
+
+```python
+result = pd.DataFrame({
+    "Actual": y_test,
+    "Predicted": predictions
+})
+
+print(result)
+```
+
+Example
+
+| Actual | Predicted |
+| ------ | --------- |
+| 1      | 1         |
+| 0      | 0         |
+| 1      | 1         |
+
+---
+
+# Step 15: Evaluate Model
+
+### Accuracy
+
+```python
+from sklearn.metrics import accuracy_score
+
+accuracy = accuracy_score(y_test, predictions)
+
+print("Accuracy:", accuracy)
+```
+
+Example
+
+```text
+Accuracy: 1.0
+```
+
+---
+
+### Confusion Matrix
+
+```python
+from sklearn.metrics import confusion_matrix
+
+print(confusion_matrix(y_test, predictions))
+```
+
+Example
+
+```text
+[[1 0]
+ [0 2]]
+```
+
+---
+
+### Classification Report
+
+```python
+from sklearn.metrics import classification_report
+
+print(classification_report(y_test, predictions))
+```
+
+Shows
+
+* Precision
+* Recall
+* F1-score
+
+---
+
+# Step 16: Predict a New Patient
+
+Suppose
+
+| Field         | Value |
+| ------------- | ----- |
+| Age           | 50    |
+| Gender        | Male  |
+| Cholesterol   | 240   |
+| BloodPressure | 145   |
+| HeartRate     | 90    |
+
+Convert Gender
+
+```text
+Male = 1
+```
+
+Code
+
+```python
+new_patient = pd.DataFrame([{
+    "Age":50,
+    "Gender":1,
+    "Cholesterol":240,
+    "BloodPressure":145,
+    "HeartRate":90
+}])
+
+prediction = model.predict(new_patient)
+
+if prediction[0] == 1:
+    print("Heart Disease Detected")
+else:
+    print("No Heart Disease")
+```
+
+Example Output
+
+```text
+Heart Disease Detected
+```
+
+---
+
+# Step 17: Save Model
+
+```python
+import joblib
+
+joblib.dump(model, "heart_disease_model.pkl")
+```
+
+Saved file
+
+```text
+heart_disease_model.pkl
+```
+
+---
+
+# Step 18: Load Model
+
+```python
+loaded_model = joblib.load("heart_disease_model.pkl")
+
+prediction = loaded_model.predict(new_patient)
+
+print(prediction)
+```
+
+---
+
+# Complete Workflow
+
+```text
+heart_disease.csv
+        │
+        ▼
+Read CSV
+        │
+        ▼
+Explore Dataset
+        │
+        ▼
+Check Missing Values
+        │
+        ▼
+Convert Gender (Male/Female → 1/0)
+        │
+        ▼
+Convert Disease (Yes/No → 1/0)
+        │
+        ▼
+Split Features (X) and Target (y)
+        │
+        ▼
+Train-Test Split
+        │
+        ▼
+Create Logistic Regression Model
+        │
+        ▼
+Train Model (fit)
+        │
+        ▼
+Predict Disease
+        │
+        ▼
+Evaluate (Accuracy, Confusion Matrix)
+        │
+        ▼
+Save Model (.pkl)
+        │
+        ▼
+Load Model
+        │
+        ▼
+Predict New Patient
+```
+
+# Complete Code
+
+```python
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+import joblib
+
+# Load dataset
+df = pd.read_csv("heart_disease.csv")
+
+# Convert categorical columns
+df["Gender"] = df["Gender"].map({
+    "Male": 1,
+    "Female": 0
+})
+
+df["Disease"] = df["Disease"].map({
+    "Yes": 1,
+    "No": 0
+})
+
+# Features and target
+X = df.drop("Disease", axis=1)
+y = df["Disease"]
+
+# Split dataset
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.2,
+    random_state=42
+)
+
+# Create Logistic Regression model
+model = LogisticRegression()
+
+# Train model
+model.fit(X_train, y_train)
+
+# Predict
+predictions = model.predict(X_test)
+
+# Evaluate
+print("Accuracy:", accuracy_score(y_test, predictions))
+print("\nConfusion Matrix:")
+print(confusion_matrix(y_test, predictions))
+print("\nClassification Report:")
+print(classification_report(y_test, predictions))
+
+# Save model
+joblib.dump(model, "heart_disease_model.pkl")
+
+# Predict a new patient
+new_patient = pd.DataFrame([{
+    "Age": 50,
+    "Gender": 1,
+    "Cholesterol": 240,
+    "BloodPressure": 145,
+    "HeartRate": 90
+}])
+
+prediction = model.predict(new_patient)
+
+if prediction[0] == 1:
+    print("Heart Disease Detected")
+else:
+    print("No Heart Disease")
+```
+
+### Interview Tip
+
+For binary categorical columns like:
+
+* `Gender` → Male/Female
+* `Disease` → Yes/No
+* `Purchased` → Yes/No
+* `Attrition` → Yes/No
+
+you can simply use:
+
+```python
+df["ColumnName"] = df["ColumnName"].map({
+    "Category1": 1,
+    "Category2": 0
+})
+```
+
+If a column has **more than two categories** (for example, `Department`, `Brand`, or `City`), use **One-Hot Encoding (`pd.get_dummies()` or `OneHotEncoder`)** instead.

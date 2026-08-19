@@ -1,0 +1,588 @@
+Perfect! This dataset is slightly different from the previous two.
+
+* **Employee dataset** → Regression (Predict `PerformanceScore`)
+* **Car dataset** → Regression (Predict `Price`)
+* **Loan dataset** → **Classification** (Predict `Default`: Yes or No)
+
+Here, the target column contains **categories** (`Yes`/`No`), so we'll use a **Classification** algorithm such as **Logistic Regression**.
+
+---
+
+# Step 1: Install Required Libraries
+
+```bash
+pip install pandas numpy scikit-learn matplotlib seaborn joblib
+```
+
+---
+
+# Step 2: Create Dataset
+
+Save the data as **loan.csv**
+
+```csv
+CustomerID,Age,Income,CreditScore,LoanAmount,Default
+C001,25,30000,620,200000,Yes
+C002,32,55000,720,350000,No
+C003,40,85000,780,500000,No
+C004,28,38000,610,250000,Yes
+C005,45,92000,810,650000,No
+C006,35,60000,700,400000,No
+C007,26,32000,590,220000,Yes
+C008,50,110000,830,700000,No
+C009,30,47000,680,320000,No
+C010,29,36000,600,240000,Yes
+C011,42,87000,790,560000,No
+C012,33,52000,710,380000,No
+C013,27,34000,610,230000,Yes
+C014,38,75000,760,480000,No
+C015,31,49000,690,340000,No
+```
+
+---
+
+# Step 3: Import Libraries
+
+```python
+import pandas as pd
+import numpy as np
+```
+
+### Explanation
+
+* **pandas** → Read CSV
+* **numpy** → Mathematical operations
+
+---
+
+# Step 4: Load Dataset
+
+```python
+df = pd.read_csv("loan.csv")
+```
+
+View data
+
+```python
+print(df)
+```
+
+---
+
+# Step 5: Explore Dataset
+
+First 5 rows
+
+```python
+print(df.head())
+```
+
+Last 5 rows
+
+```python
+print(df.tail())
+```
+
+Shape
+
+```python
+print(df.shape)
+```
+
+Output
+
+```
+(15, 6)
+```
+
+Meaning
+
+* 15 Rows
+* 6 Columns
+
+---
+
+# Step 6: Check Data Types
+
+```python
+print(df.dtypes)
+```
+
+Output
+
+```
+CustomerID     object
+Age             int64
+Income          int64
+CreditScore     int64
+LoanAmount      int64
+Default        object
+```
+
+Notice
+
+* `CustomerID` → Text
+* `Default` → Text
+
+---
+
+# Step 7: Check Missing Values
+
+```python
+print(df.isnull().sum())
+```
+
+Output
+
+```
+CustomerID     0
+Age            0
+Income         0
+CreditScore    0
+LoanAmount     0
+Default        0
+```
+
+No missing values.
+
+---
+
+# Step 8: Remove Unnecessary Column
+
+CustomerID is not useful.
+
+```python
+df = df.drop("CustomerID", axis=1)
+```
+
+---
+
+# Step 9: Convert Target to Numbers
+
+Current values
+
+```
+Yes
+No
+```
+
+Machine learning needs numbers.
+
+```python
+df["Default"] = df["Default"].map({
+    "Yes":1,
+    "No":0
+})
+```
+
+Now
+
+| Default |
+| ------- |
+| 1       |
+| 0       |
+| 1       |
+| 0       |
+
+Meaning
+
+```
+1 = Customer will default
+
+0 = Customer will not default
+```
+
+---
+
+# Step 10: Separate Features and Target
+
+Features
+
+```python
+X = df.drop("Default", axis=1)
+```
+
+Target
+
+```python
+y = df["Default"]
+```
+
+---
+
+# Step 11: Split Dataset
+
+```python
+from sklearn.model_selection import train_test_split
+
+X_train,X_test,y_train,y_test = train_test_split(
+    X,
+    y,
+    test_size=0.2,
+    random_state=42
+)
+```
+
+Training
+
+```
+12 rows
+```
+
+Testing
+
+```
+3 rows
+```
+
+---
+
+# Step 12: Choose Algorithm
+
+Since this is a **Classification** problem, use Logistic Regression.
+
+```python
+from sklearn.linear_model import LogisticRegression
+
+model = LogisticRegression()
+```
+
+---
+
+# Step 13: Train Model
+
+```python
+model.fit(X_train,y_train)
+```
+
+The model learns patterns such as:
+
+* Higher credit score → Less chance of default
+* Higher income → Less chance of default
+* Lower credit score → Higher chance of default
+
+---
+
+# Step 14: Predict
+
+```python
+predictions = model.predict(X_test)
+```
+
+Display
+
+```python
+print(predictions)
+```
+
+Example
+
+```
+[0 1 0]
+```
+
+Meaning
+
+```
+0 = No Default
+
+1 = Default
+```
+
+---
+
+# Step 15: Compare Actual vs Predicted
+
+```python
+result = pd.DataFrame({
+    "Actual":y_test,
+    "Predicted":predictions
+})
+
+print(result)
+```
+
+Example
+
+| Actual | Predicted |
+| ------ | --------- |
+| 0      | 0         |
+| 1      | 1         |
+| 0      | 0         |
+
+---
+
+# Step 16: Evaluate Model
+
+Accuracy
+
+```python
+from sklearn.metrics import accuracy_score
+
+accuracy = accuracy_score(y_test,predictions)
+
+print(accuracy)
+```
+
+Example
+
+```
+1.0
+```
+
+Meaning
+
+```
+100% Accuracy
+```
+
+---
+
+Confusion Matrix
+
+```python
+from sklearn.metrics import confusion_matrix
+
+print(confusion_matrix(y_test,predictions))
+```
+
+Example
+
+```
+[[2 0]
+ [0 1]]
+```
+
+Meaning
+
+* 2 correctly predicted "No"
+* 1 correctly predicted "Yes"
+
+---
+
+Classification Report
+
+```python
+from sklearn.metrics import classification_report
+
+print(classification_report(y_test,predictions))
+```
+
+Example
+
+```
+precision
+
+recall
+
+f1-score
+```
+
+---
+
+# Step 17: Predict a New Customer
+
+Suppose
+
+| Field       | Value  |
+| ----------- | ------ |
+| Age         | 34     |
+| Income      | 58000  |
+| CreditScore | 730    |
+| LoanAmount  | 350000 |
+
+```python
+new_customer = pd.DataFrame([{
+    "Age":34,
+    "Income":58000,
+    "CreditScore":730,
+    "LoanAmount":350000
+}])
+
+prediction = model.predict(new_customer)
+
+print(prediction)
+```
+
+Output
+
+```
+[0]
+```
+
+Meaning
+
+```
+No Default
+```
+
+Convert to text
+
+```python
+if prediction[0] == 1:
+    print("Customer will Default")
+else:
+    print("Customer will NOT Default")
+```
+
+Output
+
+```
+Customer will NOT Default
+```
+
+---
+
+# Step 18: Save Model
+
+```python
+import joblib
+
+joblib.dump(model,"loan_model.pkl")
+```
+
+Saved file
+
+```
+loan_model.pkl
+```
+
+---
+
+# Step 19: Load Model
+
+```python
+loaded_model = joblib.load("loan_model.pkl")
+```
+
+Predict
+
+```python
+loaded_model.predict(new_customer)
+```
+
+---
+
+# Complete Workflow
+
+```
+loan.csv
+      │
+      ▼
+Read CSV
+      │
+      ▼
+Explore Data
+      │
+      ▼
+Check Missing Values
+      │
+      ▼
+Drop CustomerID
+      │
+      ▼
+Convert Default (Yes/No → 1/0)
+      │
+      ▼
+Split Features (X) and Target (y)
+      │
+      ▼
+Train-Test Split
+      │
+      ▼
+Logistic Regression
+      │
+      ▼
+Train Model
+      │
+      ▼
+Predict Default
+      │
+      ▼
+Evaluate (Accuracy, Confusion Matrix)
+      │
+      ▼
+Save Model (.pkl)
+      │
+      ▼
+Load Model
+      │
+      ▼
+Predict New Customer
+```
+
+# Complete Code
+
+```python
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+import joblib
+
+# Load dataset
+df = pd.read_csv("loan.csv")
+
+# Remove unnecessary column
+df = df.drop("CustomerID", axis=1)
+
+# Convert target to numeric
+df["Default"] = df["Default"].map({
+    "Yes":1,
+    "No":0
+})
+
+# Features and target
+X = df.drop("Default", axis=1)
+y = df["Default"]
+
+# Split data
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.2,
+    random_state=42
+)
+
+# Create model
+model = LogisticRegression()
+
+# Train
+model.fit(X_train, y_train)
+
+# Predict
+predictions = model.predict(X_test)
+
+# Evaluation
+print("Accuracy:", accuracy_score(y_test, predictions))
+print("Confusion Matrix:")
+print(confusion_matrix(y_test, predictions))
+print("Classification Report:")
+print(classification_report(y_test, predictions))
+
+# Save model
+joblib.dump(model, "loan_model.pkl")
+
+# Predict new customer
+new_customer = pd.DataFrame([{
+    "Age": 34,
+    "Income": 58000,
+    "CreditScore": 730,
+    "LoanAmount": 350000
+}])
+
+prediction = model.predict(new_customer)
+
+if prediction[0] == 1:
+    print("Customer will Default")
+else:
+    print("Customer will NOT Default")
+```
+
+### Interview Tip
+
+To identify the type of ML problem:
+
+* **Regression** → Predicts a continuous numeric value (Price, Salary, Performance Score, House Price).
+* **Classification** → Predicts categories or classes (Yes/No, Fraud/Not Fraud, Spam/Not Spam, Disease/No Disease).
+* **Clustering** → Groups similar records without labeled outputs (Customer Segmentation).

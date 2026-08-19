@@ -1,0 +1,627 @@
+Perfect! This is another **Classification** problem.
+
+### Why?
+
+Target column:
+
+```text
+Purchased
+```
+
+Values:
+
+```text
+Yes
+No
+```
+
+Since the output is **Yes/No**, we use a **Classification Algorithm** such as **Logistic Regression**.
+
+---
+
+# Step 1: Install Required Libraries
+
+```bash
+pip install pandas numpy scikit-learn matplotlib seaborn joblib
+```
+
+### Explanation
+
+* **pandas** → Read CSV files
+* **numpy** → Mathematical operations
+* **scikit-learn** → Machine Learning
+* **matplotlib** → Data visualization
+* **seaborn** → Data visualization
+* **joblib** → Save and load ML models
+
+---
+
+# Step 2: Create Dataset
+
+Save the file as **car_purchase.csv**
+
+```csv
+Age,Income,Visits,DiscountUsed,Purchased
+22,25000,2,Yes,Yes
+35,55000,5,No,No
+28,40000,4,Yes,Yes
+45,85000,8,No,Yes
+31,48000,3,No,No
+26,32000,5,Yes,Yes
+40,72000,7,No,Yes
+29,39000,4,Yes,Yes
+50,92000,9,No,Yes
+33,51000,5,No,No
+24,28000,3,Yes,Yes
+38,67000,6,No,Yes
+27,36000,4,Yes,Yes
+42,80000,7,No,Yes
+30,45000,5,No,No
+```
+
+---
+
+# Step 3: Import Libraries
+
+```python
+import pandas as pd
+import numpy as np
+```
+
+### Explanation
+
+* **pandas** is used to read and manipulate datasets.
+* **numpy** is used for numerical operations.
+
+---
+
+# Step 4: Load Dataset
+
+```python
+df = pd.read_csv("car_purchase.csv")
+```
+
+Display the dataset.
+
+```python
+print(df)
+```
+
+---
+
+# Step 5: Explore Dataset
+
+First 5 rows
+
+```python
+print(df.head())
+```
+
+Last 5 rows
+
+```python
+print(df.tail())
+```
+
+Shape
+
+```python
+print(df.shape)
+```
+
+Output
+
+```text
+(15, 5)
+```
+
+Meaning
+
+* 15 Rows
+* 5 Columns
+
+Column Names
+
+```python
+print(df.columns)
+```
+
+---
+
+# Step 6: Check Data Types
+
+```python
+print(df.dtypes)
+```
+
+Output
+
+```text
+Age              int64
+Income           int64
+Visits           int64
+DiscountUsed    object
+Purchased       object
+```
+
+Notice
+
+The following columns are text:
+
+```text
+DiscountUsed
+Purchased
+```
+
+Machine Learning cannot understand text.
+
+---
+
+# Step 7: Check Missing Values
+
+```python
+print(df.isnull().sum())
+```
+
+Output
+
+```text
+Age             0
+Income          0
+Visits          0
+DiscountUsed    0
+Purchased       0
+```
+
+No missing values.
+
+---
+
+# Step 8: Convert Text Columns into Numbers
+
+Convert **DiscountUsed**
+
+```python
+df["DiscountUsed"] = df["DiscountUsed"].map({
+    "Yes":1,
+    "No":0
+})
+```
+
+Convert **Purchased**
+
+```python
+df["Purchased"] = df["Purchased"].map({
+    "Yes":1,
+    "No":0
+})
+```
+
+Now
+
+| DiscountUsed | Purchased |
+| ------------ | --------- |
+| 1            | 1         |
+| 0            | 0         |
+| 1            | 1         |
+
+Meaning
+
+```text
+Yes = 1
+
+No = 0
+```
+
+Check the updated dataset.
+
+```python
+print(df.head())
+```
+
+---
+
+# Step 9: Separate Features and Target
+
+Features (X)
+
+```python
+X = df.drop("Purchased", axis=1)
+```
+
+Target (y)
+
+```python
+y = df["Purchased"]
+```
+
+Features
+
+```text
+Age
+Income
+Visits
+DiscountUsed
+```
+
+Target
+
+```text
+Purchased
+```
+
+---
+
+# Step 10: Split Dataset
+
+80% Training
+
+20% Testing
+
+```python
+from sklearn.model_selection import train_test_split
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.2,
+    random_state=42
+)
+```
+
+Suppose
+
+Training
+
+```text
+12 rows
+```
+
+Testing
+
+```text
+3 rows
+```
+
+---
+
+# Step 11: Select Algorithm
+
+Use **Logistic Regression**.
+
+```python
+from sklearn.linear_model import LogisticRegression
+
+model = LogisticRegression()
+```
+
+---
+
+# Step 12: Train the Model
+
+```python
+model.fit(X_train, y_train)
+```
+
+The model learns patterns like:
+
+* Customers using discounts are more likely to purchase.
+* More visits may increase the chance of purchasing.
+* Income and age may influence buying decisions.
+
+---
+
+# Step 13: Predict
+
+```python
+predictions = model.predict(X_test)
+```
+
+Display predictions.
+
+```python
+print(predictions)
+```
+
+Example
+
+```text
+[1 0 1]
+```
+
+Meaning
+
+```text
+1 = Purchased
+
+0 = Not Purchased
+```
+
+---
+
+# Step 14: Compare Actual vs Predicted
+
+```python
+result = pd.DataFrame({
+    "Actual": y_test,
+    "Predicted": predictions
+})
+
+print(result)
+```
+
+Example
+
+| Actual | Predicted |
+| ------ | --------- |
+| 1      | 1         |
+| 0      | 0         |
+| 1      | 1         |
+
+---
+
+# Step 15: Evaluate the Model
+
+### Accuracy
+
+```python
+from sklearn.metrics import accuracy_score
+
+accuracy = accuracy_score(y_test, predictions)
+
+print("Accuracy:", accuracy)
+```
+
+Example
+
+```text
+Accuracy: 1.0
+```
+
+Meaning
+
+100% of the test samples were classified correctly.
+
+---
+
+### Confusion Matrix
+
+```python
+from sklearn.metrics import confusion_matrix
+
+print(confusion_matrix(y_test, predictions))
+```
+
+Example
+
+```text
+[[1 0]
+ [0 2]]
+```
+
+Meaning
+
+* 1 correctly predicted "No Purchase"
+* 2 correctly predicted "Purchased"
+
+---
+
+### Classification Report
+
+```python
+from sklearn.metrics import classification_report
+
+print(classification_report(y_test, predictions))
+```
+
+Shows:
+
+* Precision
+* Recall
+* F1-score
+
+---
+
+# Step 16: Predict a New Customer
+
+Suppose
+
+| Field        | Value |
+| ------------ | ----- |
+| Age          | 29    |
+| Income       | 42000 |
+| Visits       | 5     |
+| DiscountUsed | Yes   |
+
+Convert **DiscountUsed**
+
+```text
+Yes = 1
+```
+
+Code
+
+```python
+new_customer = pd.DataFrame([{
+    "Age":29,
+    "Income":42000,
+    "Visits":5,
+    "DiscountUsed":1
+}])
+
+prediction = model.predict(new_customer)
+
+print(prediction)
+```
+
+Output
+
+```text
+[1]
+```
+
+Convert the result into readable text.
+
+```python
+if prediction[0] == 1:
+    print("Customer Will Purchase")
+else:
+    print("Customer Will NOT Purchase")
+```
+
+Output
+
+```text
+Customer Will Purchase
+```
+
+---
+
+# Step 17: Save the Model
+
+```python
+import joblib
+
+joblib.dump(model, "car_purchase_model.pkl")
+```
+
+Saved file
+
+```text
+car_purchase_model.pkl
+```
+
+---
+
+# Step 18: Load the Model
+
+```python
+loaded_model = joblib.load("car_purchase_model.pkl")
+```
+
+Predict again
+
+```python
+loaded_model.predict(new_customer)
+```
+
+---
+
+# Complete Workflow
+
+```text
+car_purchase.csv
+        │
+        ▼
+Read CSV
+        │
+        ▼
+Explore Dataset
+        │
+        ▼
+Check Missing Values
+        │
+        ▼
+Convert Yes/No → 1/0
+        │
+        ▼
+Split Features (X) and Target (y)
+        │
+        ▼
+Train-Test Split
+        │
+        ▼
+Create Logistic Regression Model
+        │
+        ▼
+Train Model (fit)
+        │
+        ▼
+Predict Purchase
+        │
+        ▼
+Evaluate (Accuracy, Confusion Matrix)
+        │
+        ▼
+Save Model (.pkl)
+        │
+        ▼
+Load Model
+        │
+        ▼
+Predict New Customer
+```
+
+# Complete Code
+
+```python
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+import joblib
+
+# Load dataset
+df = pd.read_csv("car_purchase.csv")
+
+# Convert categorical values to numeric
+df["DiscountUsed"] = df["DiscountUsed"].map({
+    "Yes": 1,
+    "No": 0
+})
+
+df["Purchased"] = df["Purchased"].map({
+    "Yes": 1,
+    "No": 0
+})
+
+# Features and target
+X = df.drop("Purchased", axis=1)
+y = df["Purchased"]
+
+# Split dataset
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.2,
+    random_state=42
+)
+
+# Create model
+model = LogisticRegression()
+
+# Train model
+model.fit(X_train, y_train)
+
+# Make predictions
+predictions = model.predict(X_test)
+
+# Evaluate model
+print("Accuracy:", accuracy_score(y_test, predictions))
+print("\nConfusion Matrix:")
+print(confusion_matrix(y_test, predictions))
+print("\nClassification Report:")
+print(classification_report(y_test, predictions))
+
+# Save model
+joblib.dump(model, "car_purchase_model.pkl")
+
+# Predict a new customer
+new_customer = pd.DataFrame([{
+    "Age": 29,
+    "Income": 42000,
+    "Visits": 5,
+    "DiscountUsed": 1
+}])
+
+prediction = model.predict(new_customer)
+
+if prediction[0] == 1:
+    print("Customer Will Purchase")
+else:
+    print("Customer Will NOT Purchase")
+```
+
+### Interview Tip
+
+For binary columns such as `DiscountUsed` (`Yes/No`) and `Purchased` (`Yes/No`), using `map({"Yes": 1, "No": 0})` is the simplest and most common approach. One-hot encoding (`pd.get_dummies`) is generally used when a column has **more than two categories**, such as `Brand` (`Hyundai`, `Honda`, `Toyota`, etc.) or `Department` (`IT`, `HR`, `Finance`, `Sales`).
