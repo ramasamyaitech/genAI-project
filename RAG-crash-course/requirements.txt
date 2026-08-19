@@ -1,0 +1,12 @@
+# Core
+jupyter
+python-dotenv
+openai
+tiktoken
+chromadb
+
+# LangChain (used only in notebook 07)
+langchain
+langchain-openai
+langchain-chroma
+langchain-text-splitters
